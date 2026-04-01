@@ -1,5 +1,4 @@
 <?php
-// database/migrations/xxxx_xx_xx_000005_create_arsip_seleksis_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,15 +10,20 @@ return new class extends Migration
     {
         Schema::create('arsip_seleksis', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_periode', 100);
+            $table->string('nama_periode', 100)->notNull();
             $table->text('deskripsi')->nullable();
-            $table->dateTime('tanggal_buka');
-            $table->dateTime('tanggal_tutup');
-            $table->unsignedInteger('total_pendaftar')->default(0);
-            $table->unsignedInteger('total_lulus')->default(0);
-            $table->unsignedInteger('total_tidak_lulus')->default(0);
-            // Menyimpan snapshot data pendaftar dalam format JSON
-            $table->json('data_pendaftar');
+            $table->dateTime('tanggal_buka')->notNull();
+            $table->dateTime('tanggal_tutup')->notNull();
+
+            // Aggregate counters — INT (not unsigned int) per spec
+            $table->integer('total_pendaftar')->notNull()->default(0);
+            $table->integer('total_lulus')->notNull()->default(0);
+            $table->integer('total_tidak_lulus')->notNull()->default(0);
+
+            // Frozen JSON snapshot of all applicant data at archive time
+            $table->json('data_pendaftar')->notNull();
+
+            // Auto-set to NOW() on insert; no updated_at needed
             $table->timestamp('tanggal_arsip')->useCurrent();
         });
     }

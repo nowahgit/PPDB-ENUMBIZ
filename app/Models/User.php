@@ -1,5 +1,4 @@
 <?php
-// app/Models/User.php
 
 namespace App\Models;
 
@@ -17,12 +16,24 @@ class User extends Authenticatable
         'password',
         'role',
         'nomor_pendaftaran',
-        'asal_sekolah',
-        'email',
-        'jenis_kelamin',
+        'no_hp',
+        'nisn_pendaftar',
+        'nama_pendaftar',
+        'tanggallahir_pendaftar',
+        'alamat_pendaftar',
+        'agama',
+        'prestasi',
+        'nama_ortu',
+        'pekerjaan_ortu',
+        'no_hp_ortu',
+        'alamat_ortu',
+        'nilai_smt1',
+        'nilai_smt2',
+        'nilai_smt3',
+        'nilai_smt4',
+        'nilai_smt5',
         'reset_token',
         'reset_token_expiry',
-        'no_hp',
     ];
 
     protected $hidden = [
@@ -33,39 +44,45 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'password'           => 'hashed',
-            'reset_token_expiry' => 'datetime',
-            'role'               => 'string',
+            'password'               => 'hashed',
+            'reset_token_expiry'     => 'datetime',
+            'role'                   => 'string',
+            'tanggallahir_pendaftar' => 'date',
+            'nilai_smt1'             => 'float',
+            'nilai_smt2'             => 'float',
+            'nilai_smt3'             => 'float',
+            'nilai_smt4'             => 'float',
+            'nilai_smt5'             => 'float',
         ];
     }
 
-    // ─── Relasi ───────────────────────────────────────────
+    // ─── Relationships ────────────────────────────────────────────────────────
 
-    /** Satu user bisa punya satu data panitia */
+    /** Admin/panitia profile linked to this user account */
     public function admin(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasOne(Admin::class, 'user_id', 'id');
+        return $this->hasOne(Admin::class, 'user_id');
     }
 
-    /** Satu user (pendaftar) punya satu berkas */
+    /** Berkas (documents) submitted by this pendaftar */
     public function berkas(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasOne(Berkas::class, 'user_id', 'id');
+        return $this->hasOne(Berkas::class, 'user_id');
     }
 
-    /** Satu user bisa punya banyak record seleksi */
+    /** All seleksi records for this pendaftar */
     public function seleksis(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Seleksi::class, 'user_id', 'id');
+        return $this->hasMany(Seleksi::class, 'user_id');
     }
 
-    /** Audit logs yang dilakukan user ini (sebagai panitia) */
+    /** Audit log entries created by this user (when acting as panitia) */
     public function auditLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(AuditLog::class, 'panitia_id', 'id');
+        return $this->hasMany(AuditLog::class, 'panitia_id');
     }
 
-    // ─── Helper Methods ───────────────────────────────────
+    // ─── Helpers ──────────────────────────────────────────────────────────────
 
     public function isPanitia(): bool
     {

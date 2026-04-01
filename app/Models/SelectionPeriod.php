@@ -1,5 +1,4 @@
 <?php
-// app/Models/SelectionPeriod.php
 
 namespace App\Models;
 
@@ -8,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class SelectionPeriod extends Model
 {
     protected $table = 'selection_periods';
+    protected $primaryKey = 'id_periode';
 
     protected $fillable = [
-        'nama',
+        'nama_periode',
         'deskripsi',
         'tanggal_buka',
         'tanggal_tutup',
@@ -22,19 +22,15 @@ class SelectionPeriod extends Model
         return [
             'tanggal_buka'  => 'datetime',
             'tanggal_tutup' => 'datetime',
-            'status'        => 'string',
         ];
     }
 
-    // ─── Helper Methods ───────────────────────────────────
+    // ─── Helpers ──────────────────────────────────────────────────────────────
 
+    /** Whether this period is currently accepting registrations */
     public function isAktif(): bool
     {
-        return $this->status === 'AKTIF';
-    }
-
-    public function isSelesai(): bool
-    {
-        return $this->status === 'SELESAI';
+        return $this->status === 'AKTIF'
+            && now()->between($this->tanggal_buka, $this->tanggal_tutup);
     }
 }

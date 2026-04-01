@@ -1,5 +1,4 @@
 <?php
-// database/migrations/xxxx_xx_xx_000007_create_audit_logs_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,20 +10,25 @@ return new class extends Migration
     {
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('action', 100);
-            $table->string('entity_type', 100);
-            $table->unsignedBigInteger('entity_id')->nullable();
-            $table->text('before')->nullable();  // snapshot JSON sebelum perubahan
-            $table->text('after')->nullable();   // snapshot JSON sesudah perubahan
+
+            // What happened
+            $table->string('action', 100)->notNull();
+            $table->string('entity_type', 100)->notNull();
+            $table->bigInteger('entity_id')->notNull();  // signed BIGINT per spec
+
+            // Optional before/after JSON snapshots for data-change auditing
+            $table->longText('before')->nullable();   // LONGTEXT per spec
+            $table->longText('after')->nullable();    // LONGTEXT per spec
+
             $table->text('keterangan')->nullable();
 
-            // Panitia yang melakukan aksi (nullable: bisa aksi sistem)
+            // FK → users.id — nullable: system-generated logs have no panitia
             $table->foreignId('panitia_id')
                   ->nullable()
                   ->constrained('users')
-                  ->onUpdate('cascade')
                   ->onDelete('set null');
 
+            // Single timestamp; no updated_at since logs are immutable
             $table->timestamp('created_at')->useCurrent();
         });
     }

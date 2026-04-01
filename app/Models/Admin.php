@@ -1,5 +1,4 @@
 <?php
-// app/Models/Admin.php
 
 namespace App\Models;
 
@@ -10,7 +9,7 @@ class Admin extends Model
     protected $table      = 'admins';
     protected $primaryKey = 'id_panitia';
 
-    // Tabel admins tidak punya timestamps (sesuai migration)
+    /** admins table has no timestamps columns */
     public $timestamps = false;
 
     protected $fillable = [
@@ -19,15 +18,15 @@ class Admin extends Model
         'no_hp',
     ];
 
-    // ─── Relasi ───────────────────────────────────────────
+    // ─── Relationships ────────────────────────────────────────────────────────
 
-    /** Admin berasal dari satu user */
+    /** The user account this admin profile belongs to */
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    /** Satu panitia bisa menginput banyak record seleksi */
+    /** All seleksi records entered by this admin */
     public function seleksis(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Seleksi::class, 'id_panitia', 'id_panitia');

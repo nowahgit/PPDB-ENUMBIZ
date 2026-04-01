@@ -1,5 +1,4 @@
 <?php
-// database/migrations/xxxx_xx_xx_000006_create_seleksis_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,33 +11,34 @@ return new class extends Migration
         Schema::create('seleksis', function (Blueprint $table) {
             $table->id('id_seleksi');
 
-            // Relasi ke panitia yang menginput
-            $table->unsignedBigInteger('id_panitia');
+            // ── FK: Panitia yang menginput (admins.id_panitia) ───────
+            // Must use manual FK — foreignId() assumes column = id
+            $table->unsignedBigInteger('id_panitia')->notNull();
             $table->foreign('id_panitia')
                   ->references('id_panitia')
                   ->on('admins')
-                  ->onUpdate('cascade')
                   ->onDelete('restrict');
 
-            // Relasi ke akun pendaftar
+            // ── FK: Pendaftar (users.id) ─────────────────────────────
             $table->foreignId('user_id')
                   ->constrained('users')
-                  ->onUpdate('cascade')
                   ->onDelete('cascade');
 
-            $table->string('nama_seleksi', 50);
+            $table->string('nama_seleksi', 50)->notNull();
 
-            // Nilai rapor per semester
-            $table->float('nilai_smt1', 5, 2)->default(0);
-            $table->float('nilai_smt2', 5, 2)->default(0);
-            $table->float('nilai_smt3', 5, 2)->default(0);
-            $table->float('nilai_smt4', 5, 2)->default(0);
-            $table->float('nilai_smt5', 5, 2)->default(0);
+            // ── Nilai 5 Semester ─────────────────────────────────────
+            // DECIMAL(5,2): max value 999.99, precision for academic scores
+            $table->decimal('nilai_smt1', 5, 2)->notNull();
+            $table->decimal('nilai_smt2', 5, 2)->notNull();
+            $table->decimal('nilai_smt3', 5, 2)->notNull();
+            $table->decimal('nilai_smt4', 5, 2)->notNull();
+            $table->decimal('nilai_smt5', 5, 2)->notNull();
 
             $table->enum('status_seleksi', ['MENUNGGU', 'LULUS', 'TIDAK_LULUS'])
                   ->default('MENUNGGU');
-            $table->dateTime('waktu_seleksi');
+            $table->dateTime('waktu_seleksi')->notNull();
             $table->boolean('is_archived')->default(false);
+
             $table->timestamps();
         });
     }

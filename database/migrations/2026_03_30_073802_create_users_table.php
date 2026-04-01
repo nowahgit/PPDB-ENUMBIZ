@@ -1,5 +1,4 @@
 <?php
-// database/migrations/xxxx_xx_xx_000001_create_users_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -10,17 +9,27 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
+            // Primary Key
             $table->id();
-            $table->string('username', 20)->unique();
-            $table->string('password');
+
+            // Credentials
+            $table->string('username', 20)->unique()->notNull();
+            $table->string('password', 255)->notNull();
+
+            // Role
             $table->enum('role', ['PENDAFTAR', 'PANITIA'])->default('PENDAFTAR');
-            $table->string('nomor_pendaftaran')->nullable()->unique();
-            $table->string('asal_sekolah')->nullable();
-            $table->string('email')->unique();
-            $table->string('jenis_kelamin', 20)->nullable();
-            $table->string('reset_token')->nullable();
-            $table->dateTime('reset_token_expiry')->nullable();
+
+            // Pendaftar-specific fields
+            $table->string('nomor_pendaftaran', 20)->unique()->nullable();
+            $table->string('asal_sekolah', 100)->nullable();
+            $table->string('email', 100)->unique()->nullable();
+            $table->string('jenis_kelamin', 10)->nullable();
             $table->string('no_hp', 15)->nullable();
+
+            // Password Reset
+            $table->string('reset_token', 255)->nullable();
+            $table->timestamp('reset_token_expiry')->nullable();
+
             $table->timestamps();
         });
     }

@@ -1,8 +1,8 @@
 <?php
-// app/Models/Seleksi.php
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class Seleksi extends Model
@@ -27,37 +27,44 @@ class Seleksi extends Model
     protected function casts(): array
     {
         return [
-            'nilai_smt1'     => 'float',
-            'nilai_smt2'     => 'float',
-            'nilai_smt3'     => 'float',
-            'nilai_smt4'     => 'float',
-            'nilai_smt5'     => 'float',
-            'waktu_seleksi'  => 'datetime',
-            'is_archived'    => 'boolean',
-            'status_seleksi' => 'string',
+            'waktu_seleksi' => 'datetime',
+            'is_archived'   => 'boolean',
+            'nilai_smt1'    => 'float',
+            'nilai_smt2'    => 'float',
+            'nilai_smt3'    => 'float',
+            'nilai_smt4'    => 'float',
+            'nilai_smt5'    => 'float',
         ];
     }
 
-    // ─── Relasi ───────────────────────────────────────────
+    // ─── Relationships ────────────────────────────────────────────────────────
 
-    /** Seleksi dilakukan terhadap satu pendaftar (user) */
+    /** The pendaftar this seleksi record belongs to */
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    /** Seleksi diinput oleh satu panitia */
+    /** The panitia who entered this seleksi record */
     public function panitia(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Admin::class, 'id_panitia', 'id_panitia');
     }
 
-    // ─── Helper / Computed ────────────────────────────────
+    // ─── Accessors ────────────────────────────────────────────────────────────
 
-    /** Rata-rata nilai dari 5 semester */
-    public function getRataRataNilaiAttribute(): float
+    /**
+     * Average academic score across all 5 semesters, rounded to 2 decimal places.
+     * Usage: $seleksi->rata_rata
+     */
+    protected function rataRata(): Attribute
     {
-        return ($this->nilai_smt1 + $this->nilai_smt2 + $this->nilai_smt3
-              + $this->nilai_smt4 + $this->nilai_smt5) / 5;
+        return Attribute::make(
+            get: fn () => round(
+                ($this->nilai_smt1 + $this->nilai_smt2 + $this->nilai_smt3
+                    + $this->nilai_smt4 + $this->nilai_smt5) / 5,
+                2
+            )
+        );
     }
 }
