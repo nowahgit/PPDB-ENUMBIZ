@@ -78,7 +78,9 @@
                             <!-- Personal Info -->
                             <td class="px-6 py-5 border-r border-slate-200 leading-relaxed">
                                 <p class="font-bold text-slate-600">NISN: {{ $user->nisn_pendaftar ?? '-' }}</p>
-                                <p class="text-slate-400 mt-0.5">AGAMA: {{ strtoupper($user->agama ?? '-') }}</p>
+                                <p class="text-slate-400 mt-0.5 text-[9px] uppercase tracking-wider">
+                                    {{ $user->agama ?? '-' }} &bull; {{ $user->jenis_kelamin ?? '-' }}
+                                </p>
                                 <p class="text-slate-400 text-[9px] mt-1 max-w-[200px]">{{ $user->alamat_pendaftar ?? '-' }}</p>
                             </td>
 

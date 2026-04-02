@@ -56,6 +56,7 @@ class DatabaseSeeder extends Seeder
                     'email'    => 'siswa' . $i . '@gmail.com',
                     'nomor_pendaftaran' => 'PPDB' . date('Y') . sprintf('%04d', $i),
                     'no_hp' => '08' . $faker->numerify('##########'),
+                    'jenis_kelamin' => $faker->randomElement(['Laki-laki', 'Perempuan']),
                     'nisn_pendaftar' => $nisn,
                     'nama_pendaftar' => $nama,
                     'tanggallahir_pendaftar' => $faker->dateTimeBetween('-16 years', '-14 years')->format('Y-m-d'),

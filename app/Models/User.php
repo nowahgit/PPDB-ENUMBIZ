@@ -17,6 +17,7 @@ class User extends Authenticatable
         'role',
         'nomor_pendaftaran',
         'no_hp',
+        'jenis_kelamin',
         'nisn_pendaftar',
         'nama_pendaftar',
         'tanggallahir_pendaftar',
