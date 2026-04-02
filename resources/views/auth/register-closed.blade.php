@@ -12,7 +12,7 @@
 </head>
 <body class="bg-slate-50 min-h-screen flex items-center justify-center p-6">
 
-    <div class="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-10 text-center shadow-xl shadow-slate-200/50">
+    <div class="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-8 sm:p-10 text-center shadow-xl shadow-slate-200/50">
         <div class="w-20 h-20 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>

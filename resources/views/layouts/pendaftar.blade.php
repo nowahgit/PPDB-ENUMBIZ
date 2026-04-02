@@ -20,7 +20,8 @@
 <body class="min-h-screen" x-data="{ sidebarOpen: false }">
 
     <!-- Sidebar Desktop -->
-    <aside class="sidebar fixed inset-y-0 left-0 hidden lg:flex flex-col z-50 transition-opacity duration-200">
+    <aside class="sidebar fixed inset-y-0 left-0 z-50 flex flex-col transition-transform duration-300 transform -translate-x-full lg:translate-x-0"
+           :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}">
         <div class="p-6">
             <h1 class="text-white font-bold text-lg tracking-tight px-2">Enumbiz School</h1>
             <p class="text-gray-500 text-[11px] font-medium uppercase tracking-widest px-2 mt-1">Portal Pendaftar</p>

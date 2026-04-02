@@ -21,16 +21,46 @@ class AdminController extends Controller
         $valid = Berkas::where('status_validasi', 'VALID')->count();
         $ditolak = Berkas::where('status_validasi', 'DITOLAK')->count();
         $totalAdmin = Admin::count();
-        $admins = Admin::all(); // Mengambil daftar seluruh panitia
+        $admins = Admin::with('user')->get();
         
+        $activePeriod = \App\Models\SelectionPeriod::where('status', 'AKTIF')
+            ->whereDate('tanggal_buka', '<=', now())
+            ->whereDate('tanggal_tutup', '>=', now())
+            ->first();
+
+        $lolosSeleksi = \App\Models\Seleksi::where('status_seleksi', 'LULUS')->count();
+
         $recentApplicants = User::with('berkas')
             ->where('role', 'PENDAFTAR')
             ->latest('id')
             ->take(5)
             ->get();
 
+        // Chart 1: Jenis Kelamin
+        $genderChart = User::where('role', 'PENDAFTAR')
+            ->selectRaw('count(*) as total, jenis_kelamin')
+            ->groupBy('jenis_kelamin')
+            ->get();
+
+        // Chart 2: Umur
+        $ageChart = User::where('role', 'PENDAFTAR')
+            ->whereNotNull('tanggallahir_pendaftar')
+            ->get()
+            ->groupBy(function($user) {
+                return \Carbon\Carbon::parse($user->tanggallahir_pendaftar)->age;
+            })->map(function($group) {
+                return $group->count();
+            });
+
+        // Chart 3: Nilai (Highest to Lowest Distribution)
+        $scoreCharts = \App\Models\Seleksi::selectRaw('ROUND((nilai_smt1+nilai_smt2+nilai_smt3+nilai_smt4+nilai_smt5)/5, 0) as avg_score, count(*) as total')
+            ->groupBy('avg_score')
+            ->orderBy('avg_score', 'desc')
+            ->get();
+
         return view('admin.dashboard', compact(
-            'totalPendaftar', 'menunggu', 'valid', 'ditolak', 'totalAdmin', 'admins', 'recentApplicants'
+            'totalPendaftar', 'menunggu', 'valid', 'ditolak', 'totalAdmin', 'admins', 'recentApplicants',
+            'activePeriod', 'lolosSeleksi', 'genderChart', 'ageChart', 'scoreCharts'
         ));
     }
 
@@ -195,6 +225,7 @@ class AdminController extends Controller
             'nama_panitia' => ['required', 'string', 'max:50'],
             'username'     => ['required', 'string', 'max:20', 'unique:users,username'],
             'password'     => ['required', 'string', 'min:6'],
+            'no_hp'        => ['required', 'string', 'max:15'],
         ]);
 
         $user = User::create([
@@ -206,6 +237,7 @@ class AdminController extends Controller
         Admin::create([
             'user_id'      => $user->id,
             'nama_panitia' => $request->nama_panitia,
+            'no_hp'        => $request->no_hp,
         ]);
 
         return back()->with('success', 'Staf panitia baru berhasil didaftarkan.');
@@ -218,12 +250,16 @@ class AdminController extends Controller
             'nama_panitia' => ['required', 'string', 'max:50'],
             'username'     => ['required', 'string', 'max:20', 'unique:users,username,' . $id],
             'password'     => ['nullable', 'string', 'min:6'],
+            'no_hp'        => ['required', 'string', 'max:15'],
         ]);
 
         $admin = Admin::where('user_id', $id)->firstOrFail();
         $user = User::findOrFail($id);
 
-        $admin->update(['nama_panitia' => $request->nama_panitia]);
+        $admin->update([
+            'nama_panitia' => $request->nama_panitia,
+            'no_hp'        => $request->no_hp,
+        ]);
         $user->update(['username' => $request->username]);
 
         if ($request->password) {

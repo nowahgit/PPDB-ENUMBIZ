@@ -1,5 +1,6 @@
+@push('modals')
 <!-- Modal Seleksi Otomatis -->
-<div x-show="showOtomatis" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111827]/60 backdrop-blur-sm" style="display: none;" x-transition>
+<div x-show="showOtomatis" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111827]/60 backdrop-blur-sm" style="display: none;" x-transition x-cloak>
     <div class="bg-white border border-[#e2e8f0] rounded-lg shadow-2xl w-full max-w-sm overflow-hidden" @click.away="showOtomatis = false">
         <div class="p-4 border-b border-[#f1f5f9] bg-slate-50 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[#1e3a8a]">Alat Seleksi Otomatis</div>
         <form action="{{ route('admin.seleksi.otomatis') }}" method="POST" class="p-6 space-y-4">
@@ -15,7 +16,7 @@
 </div>
 
 <!-- Modal Konfirmasi Arsip -->
-<div x-show="showArchiveConfirm" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111827]/60 backdrop-blur-sm" style="display: none;" x-transition>
+<div x-show="showArchiveConfirm" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111827]/60 backdrop-blur-sm" style="display: none;" x-transition x-cloak>
     <div class="bg-white border border-[#e2e8f0] rounded-lg shadow-2xl w-full max-w-sm overflow-hidden" @click.away="showArchiveConfirm = false">
         <div class="p-4 border-b border-[#f1f5f9] bg-slate-50 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-red-600">Peringatan: Reset Sistem</div>
         <form action="{{ route('admin.arsip.store') }}" method="POST" class="p-6 space-y-4">
@@ -32,7 +33,7 @@
 </div>
 
 <!-- Modal Form Periode (Tambah / Edit) -->
-<div x-show="showAddPeriod" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#111827]/40 backdrop-blur-sm" style="display: none;" x-transition>
+<div x-show="showAddPeriod" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111827]/60 backdrop-blur-sm" style="display: none;" x-transition x-cloak>
     <div class="bg-white border border-[#e2e8f0] rounded-lg shadow-2xl w-full max-w-md overflow-hidden" @click.away="showAddPeriod = false; editPeriod = null">
         <div class="p-5 border-b border-[#f1f5f9] flex justify-between items-center bg-slate-50"><h3 class="text-[10px] font-black text-[#111827] uppercase tracking-widest" x-text="editPeriod ? 'Edit Periode' : 'Buka Periode Pendaftaran Baru'"></h3></div>
         <form :action="editPeriod ? '/admin/periode/' + editPeriod.id_periode : '{{ route('admin.periode.store') }}'" method="POST" class="p-6 space-y-5">
@@ -48,7 +49,7 @@
 </div>
 
 <!-- Modal View Archive Detail JSON -->
-<div x-show="selectedArchive" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111827]/40 backdrop-blur-sm" style="display: none;" x-transition>
+<div x-show="selectedArchive" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111827]/60 backdrop-blur-sm" style="display: none;" x-transition x-cloak>
     <div class="bg-white border border-[#e2e8f0] rounded-lg shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col h-[85vh]">
         <div class="p-5 border-b border-[#f1f5f9] flex justify-between items-center bg-slate-50">
             <h3 class="text-[10px] font-bold text-[#111827] uppercase tracking-[.2em]" x-text="'Histori Snapshot: ' + selectedArchive?.nama_periode"></h3>
@@ -78,3 +79,4 @@
         </div>
     </div>
 </div>
+@endpush

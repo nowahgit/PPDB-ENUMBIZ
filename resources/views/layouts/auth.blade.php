@@ -95,7 +95,7 @@
                 @endif
 
                 <!-- Content Area -->
-                <div class="bg-white p-10 rounded-2xl shadow-sm border border-gray-100">
+                <div class="bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-gray-100">
                     @yield('content')
                 </div>
             </div>

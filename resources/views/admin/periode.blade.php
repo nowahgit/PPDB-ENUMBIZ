@@ -3,14 +3,14 @@
 @section('title', 'Manajemen Periode Pendaftaran — Enumbiz')
 
 @section('content')
-<div class="space-y-8 max-w-6xl" x-data="{ showAdd: false, editPeriod: null }">
+<div class="space-y-8 max-w-6xl">
     
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="flex flex-col gap-1">
             <h1 class="text-2xl font-bold text-[#111827]">Manajemen Periode Pendaftaran</h1>
             <p class="text-sm text-[#6b7280]">Kontrol kapan pendaftaran dibuka dan ditutup untuk publik.</p>
         </div>
-        <button @click="showAdd = true" class="bg-[#1e3a8a] text-white px-6 py-2.5 rounded font-bold text-xs uppercase tracking-widest hover:bg-blue-800 transition-colors shadow-sm">
+        <button @click="showAddPeriod = true" class="bg-[#1e3a8a] text-white px-6 py-2.5 rounded font-bold text-xs uppercase tracking-widest hover:bg-blue-800 transition-colors shadow-sm">
             Buka Periode Baru
         </button>
     </div>
@@ -57,7 +57,7 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">
-                                    <button @click="editPeriod = {{ json_encode($period) }}; showAdd = true" 
+                                    <button @click="editPeriod = {{ json_encode($period) }}; showAddPeriod = true" 
                                             class="w-8 h-8 flex items-center justify-center rounded bg-slate-50 border border-slate-200 text-[#1e3a8a] hover:bg-[#1e3a8a] hover:text-white transition-all">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
                                     </button>
@@ -75,12 +75,15 @@
         </div>
     </div>
 
+</div>
+
+@push('modals')
     <!-- Modal Form (Tambah / Edit) -->
-    <div x-show="showAdd" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-[#111827]/40 backdrop-blur-sm" style="display: none;">
-        <div class="bg-white border border-[#e2e8f0] rounded-lg shadow-2xl w-full max-w-md overflow-hidden" @click.away="showAdd = false; editPeriod = null">
+    <div x-show="showAddPeriod" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111827]/60 backdrop-blur-sm" style="display: none;" x-transition x-cloak>
+        <div class="bg-white border border-[#e2e8f0] rounded-lg shadow-2xl w-full max-w-md overflow-hidden" @click.away="showAddPeriod = false; editPeriod = null">
             <div class="p-5 border-b border-[#f1f5f9] flex justify-between items-center bg-slate-50">
                 <h3 class="text-xs font-black text-[#111827] uppercase tracking-widest" x-text="editPeriod ? 'Edit Periode' : 'Buka Periode Pendaftaran Baru'"></h3>
-                <button @click="showAdd = false; editPeriod = null" class="text-gray-400 hover:text-black">
+                <button @click="showAddPeriod = false; editPeriod = null" class="text-gray-400 hover:text-black">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
@@ -114,7 +117,7 @@
                 </div>
 
                 <div class="pt-4 flex gap-3">
-                    <button type="button" @click="showAdd = false; editPeriod = null" 
+                    <button type="button" @click="showAddPeriod = false; editPeriod = null" 
                             class="flex-1 px-6 py-3 border border-[#d1d5db] rounded text-[10px] font-bold uppercase tracking-widest hover:bg-slate-50">Batal</button>
                     <button type="submit" class="flex-1 px-6 py-3 bg-[#1e3a8a] text-white rounded text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-colors shadow-lg">
                         Simpan Periode
@@ -123,6 +126,7 @@
             </form>
         </div>
     </div>
+@endpush
 
 </div>
 @endsection

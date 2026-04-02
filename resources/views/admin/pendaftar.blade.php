@@ -24,39 +24,39 @@
 
     <!-- Search Cockpit (Consistent with selection hub) -->
     <div class="bg-white border border-[#f1f5f9] p-4 shadow-sm">
-        <form action="{{ route('admin.pendaftar') }}" method="GET" class="flex flex-wrap items-center gap-4">
-            <div class="flex-1 min-w-[300px] flex items-center border border-[#f1f5f9] bg-slate-50 px-4 py-2">
+        <form action="{{ route('admin.pendaftar') }}" method="GET" class="flex flex-col md:flex-row items-center gap-4 w-full">
+            <div class="w-full md:flex-1 flex items-center border border-[#f1f5f9] bg-slate-50 px-4 py-2 mt-2 md:mt-0">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-400 mr-2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                 <input type="text" name="search" value="{{ $search }}" placeholder="Cari Nama, NISN, atau ID..." 
                        class="w-full text-xs outline-none bg-transparent font-bold text-slate-700">
             </div>
-            <div class="flex items-center border border-[#f1f5f9] bg-slate-50 px-4 py-2">
+            <div class="w-full md:w-auto flex flex-1 md:flex-none items-center border border-[#f1f5f9] bg-slate-50 px-4 py-2">
                 <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-3">Status:</span>
-                <select name="status" class="text-[10px] font-bold uppercase outline-none bg-transparent">
+                <select name="status" class="text-[10px] w-full md:w-auto font-bold uppercase outline-none bg-transparent">
                     <option value="">Semua</option>
                     <option value="MENUNGGU" {{ $status == 'MENUNGGU' ? 'selected' : '' }}>Menunggu</option>
                     <option value="VALID" {{ $status == 'VALID' ? 'selected' : '' }}>Valid</option>
                     <option value="DITOLAK" {{ $status == 'DITOLAK' ? 'selected' : '' }}>Ditolak</option>
                 </select>
             </div>
-            <button type="submit" class="bg-[#1e3a8a] text-white px-10 py-3 rounded text-[10px] font-black uppercase tracking-widest hover:bg-black">Terapkan Filter</button>
+            <button type="submit" class="w-full md:w-auto bg-[#1e3a8a] text-white px-10 py-3 rounded text-[10px] font-black uppercase tracking-widest hover:bg-black">Terapkan Filter</button>
         </form>
     </div>
 
     <!-- Master Sheet (Grid System with Thin Borders) -->
-    <div class="bg-white border border-[#f1f5f9] shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-[10px] min-w-[2400px]">
+    <div class="bg-white border border-[#f1f5f9] overflow-hidden" style="border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 20px;">
+        <div class="overflow-x-auto w-full max-w-full">
+            <table class="w-full text-left border-collapse text-[10px]" style="min-width: 1400px; width: max-content;">
                 <thead>
                     <tr class="bg-slate-50 border-b border-[#f1f5f9]">
-                        <th class="px-6 py-5 font-black border-r border-[#f1f5f9] text-[#6b7280] uppercase tracking-widest bg-slate-50 sticky left-0 z-20">ID & Nama Pendaftar</th>
+                        <th class="px-6 py-5 font-black border-r border-[#f1f5f9] text-[#6b7280] uppercase tracking-widest bg-slate-50 sticky left-0 z-20 shadow-[2px_0_5px_rgba(0,0,0,0.1)]">ID & Nama Pendaftar</th>
                         <th class="px-6 py-5 font-black border-r border-[#f1f5f9] text-[#6b7280] uppercase tracking-widest">Informasi Dasar</th>
                         <th class="px-6 py-5 font-black border-r border-[#f1f5f9] text-[#6b7280] uppercase tracking-widest">Wali & Kontak</th>
                         <th class="px-6 py-5 font-black border-r border-[#f1f5f9] text-[#6b7280] uppercase tracking-widest text-center">Berkas Utama</th>
                         <th class="px-6 py-5 font-black border-r border-[#f1f5f9] text-[#6b7280] uppercase tracking-widest text-center">Prestasi / Sertifikat</th>
                         <th class="px-6 py-5 font-black border-r border-[#f1f5f9] text-[#6b7280] uppercase tracking-widest text-center">Rapor (S1 - S5)</th>
                         <th class="px-6 py-5 font-black border-r border-[#f1f5f9] text-[#6b7280] uppercase tracking-widest text-center">Akumulasi</th>
-                        <th class="px-6 py-5 font-black text-[#6b7280] uppercase tracking-widest text-right sticky right-0 z-20 bg-slate-50">Validasi</th>
+                        <th class="px-6 py-5 font-black text-[#6b7280] uppercase tracking-widest text-right sticky right-0 z-20 bg-slate-50 shadow-[-2px_0_5px_rgba(0,0,0,0.1)]">Validasi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#f1f5f9]">
