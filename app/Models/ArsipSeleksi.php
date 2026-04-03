@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ArsipSeleksi extends Model
 {
     protected $table = 'arsip_seleksis';
-    protected $primaryKey = 'id_arsip';
+    protected $primaryKey = 'id';
 
     /**
      * arsip_seleksis has only tanggal_arsip (no standard updated_at).
@@ -37,6 +37,6 @@ class ArsipSeleksi extends Model
 
     public function detailPendaftar()
     {
-        return $this->hasMany(ArsipPendaftar::class, 'arsip_seleksi_id', 'id_arsip');
+        return $this->hasMany(ArsipPendaftar::class, 'arsip_seleksi_id', 'id');
     }
 }

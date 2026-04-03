@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('arsip_pendaftars', function (Blueprint $table) {
             $table->id('id_arsip_pendaftar');
-            $table->foreignId('arsip_seleksi_id')->constrained('arsip_seleksis', 'id_arsip')->onDelete('cascade');
+            $table->foreignId('arsip_seleksi_id')->constrained('arsip_seleksis', 'id')->onDelete('cascade');
             $table->string('nomor_pendaftaran', 20);
             $table->string('nama', 100);
             $table->string('nisn', 20);
