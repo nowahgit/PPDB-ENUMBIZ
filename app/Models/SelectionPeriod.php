@@ -10,7 +10,7 @@ class SelectionPeriod extends Model
     protected $primaryKey = 'id_periode';
 
     protected $fillable = [
-        'nama_periode',
+        'nama',
         'deskripsi',
         'tanggal_buka',
         'tanggal_tutup',

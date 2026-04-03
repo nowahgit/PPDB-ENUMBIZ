@@ -99,7 +99,7 @@ class AdminController extends Controller
      */
     public function showPendaftar($id)
     {
-        $user = User::with(['berkas', 'seleksis'])->findOrFail($id);
+        $user = User::withTrashed()->with(['berkas', 'seleksis'])->findOrFail($id);
         return view('admin.pendaftar-detail', compact('user'));
     }
 
@@ -150,7 +150,7 @@ class AdminController extends Controller
 
         $user = User::create([
             'username' => $request->username,
-            'password' => bcrypt($request->password),
+            'password' => $request->password,
             'role'     => 'PENDAFTAR',
             'nomor_pendaftaran' => strtoupper(uniqid('E-')),
             'nama_pendaftar'    => $request->nama_pendaftar,
@@ -175,13 +175,13 @@ class AdminController extends Controller
     /** Edit Pendaftar (Admin) */
     public function pendaftarEdit($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::withTrashed()->findOrFail($id);
         return view('admin.pendaftar-form', compact('user'));
     }
 
     public function pendaftarUpdate(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::withTrashed()->findOrFail($id);
         
         $request->validate([
             'username' => ['required', 'string', 'max:20', 'unique:users,username,' . $id],
@@ -195,7 +195,7 @@ class AdminController extends Controller
         ]);
 
         if ($request->password) {
-            $data['password'] = bcrypt($request->password);
+            $data['password'] = $request->password;
         }
 
         $user->update($data);
@@ -206,8 +206,12 @@ class AdminController extends Controller
     /** Hapus Pendaftar (Admin) */
     public function pendaftarDestroy($id)
     {
-        $user = User::findOrFail($id);
-        $user->delete(); // Cascading handle deleting berkas & seleksi
+        $user = User::withTrashed()->findOrFail($id);
+        
+        $user->berkas()?->delete();
+        $user->seleksis()->delete();
+        $user->delete();
+
         return redirect()->route('admin.pendaftar')->with('success', 'Akun pendaftar dan seluruh datanya telah dihapus.');
     }
 
@@ -230,7 +234,7 @@ class AdminController extends Controller
 
         $user = User::create([
             'username' => $request->username,
-            'password' => bcrypt($request->password),
+            'password' => $request->password,
             'role'     => 'PANITIA',
         ]);
 
@@ -263,7 +267,7 @@ class AdminController extends Controller
         $user->update(['username' => $request->username]);
 
         if ($request->password) {
-            $user->update(['password' => bcrypt($request->password)]);
+            $user->update(['password' => $request->password]);
         }
 
         return back()->with('success', 'Data profil staf berhasil diperbarui.');
@@ -313,7 +317,9 @@ class AdminController extends Controller
     public function periodeUpdate(Request $request, $id)
     {
         $period = \App\Models\SelectionPeriod::findOrFail($id);
-        $period->update($request->all());
+        $period->update($request->only([
+            'nama_periode', 'deskripsi', 'tanggal_buka', 'tanggal_tutup', 'status'
+        ]));
         return back()->with('success', 'Data periode berhasil diperbarui.');
     }
 
