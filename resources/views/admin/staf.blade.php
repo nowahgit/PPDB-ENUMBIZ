@@ -40,10 +40,10 @@
                                 <p class="font-bold text-[#111827]">{{ $adm->nama_panitia }}</p>
                                 <p class="text-[10px] text-[#1e3a8a] font-mono mt-0.5">#ADM-{{ str_pad($adm->id_panitia, 3, '0', STR_PAD_LEFT) }}</p>
                             </td>
-                            <td class="px-6 py-4 text-[#6b7280]">{{ $adm->user->username ?? 'Unknown' }}</td>
+                            <td class="px-6 py-4 text-[#6b7280]">{{ optional($adm->user)->username ?? 'Unknown' }}</td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">
-                                    <button @click="editStaff = {{ json_encode(['id' => $adm->user_id, 'nama' => $adm->nama_panitia, 'username' => $adm->user->username, 'no_hp' => $adm->no_hp]) }}; showAddStaff = true" 
+                                    <button @click="editStaff = {{ json_encode(['id' => $adm->user_id, 'nama' => $adm->nama_panitia, 'username' => optional($adm->user)->username ?? '', 'no_hp' => $adm->no_hp]) }}; showAddStaff = true" 
                                             title="Edit" class="w-8 h-8 flex items-center justify-center rounded bg-slate-50 border border-slate-200 text-[#1e3a8a] hover:bg-[#1e3a8a] hover:text-white transition-all">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
                                     </button>

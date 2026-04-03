@@ -19,6 +19,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function () {
+            // 0. Cleanup orphan admins (user-nya sudah tidak ada)
+            DB::table('admins')
+                ->leftJoin('users', 'admins.user_id', '=', 'users.id')
+                ->whereNull('users.id')
+                ->delete();
+
             // 1. Create the User account with role PANITIA
             $adminUser = User::updateOrCreate(
                 ['username' => 'admin'],
