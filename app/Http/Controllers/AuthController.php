@@ -94,4 +94,76 @@ class AuthController extends Controller
 
         return redirect('/login')->with('success', 'Anda telah keluar.');
     }
+
+    /** Tampilkan form lupa password */
+    public function showForgotPassword()
+    {
+        return view('auth.forgot-password');
+    }
+
+    /** Proses kirim instruksi reset (Simulasi/Internal) */
+    public function sendResetLink(Request $request)
+    {
+        $request->validate(['email_or_username' => 'required']);
+
+        $user = User::where('email', $request->email_or_username)
+            ->orWhere('username', $request->email_or_username)
+            ->first();
+
+        if (!$user) {
+            return back()->with('error', 'Data akun tidak ditemukan.');
+        }
+
+        // Generate Token
+        $token = bin2hex(random_bytes(32));
+        $expiry = now()->addMinutes(config('auth.reset_token_lifetime', env('RESET_TOKEN_LIFETIME', 60)));
+
+        $user->update([
+            'reset_token'        => $token,
+            'reset_token_expiry' => $expiry,
+        ]);
+
+        // Karena tidak ada SMTP, kita arahkan langsung ke halaman ganti password dengan token
+        return redirect()->route('password.reset', ['token' => $token])
+            ->with('info', 'Permintaan reset diterima. Silakan masukkan password baru Anda.');
+    }
+
+    /** Tampilkan form ganti password baru */
+    public function showResetPassword($token)
+    {
+        $user = User::where('reset_token', $token)
+            ->where('reset_token_expiry', '>', now())
+            ->first();
+
+        if (!$user) {
+            return redirect()->route('password.request')->with('error', 'Token reset tidak valid atau sudah kadaluarsa.');
+        }
+
+        return view('auth.reset-password', compact('token'));
+    }
+
+    /** Proses update password baru */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token'    => 'required',
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        $user = User::where('reset_token', $request->token)
+            ->where('reset_token_expiry', '>', now())
+            ->first();
+
+        if (!$user) {
+            return redirect()->route('password.request')->with('error', 'Gagal mereset password. Silakan coba lagi.');
+        }
+
+        $user->update([
+            'password'           => Hash::make($request->password),
+            'reset_token'        => null,
+            'reset_token_expiry' => null,
+        ]);
+
+        return redirect()->route('login')->with('success', 'Password Anda telah berhasil diperbarui. Silakan login.');
+    }
 }

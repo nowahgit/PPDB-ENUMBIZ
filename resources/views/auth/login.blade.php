@@ -65,7 +65,10 @@
 
                 <!-- Actions -->
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-                    <a href="{{ route('register') }}" class="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors">Belum punya akun? Daftar</a>
+                    <div class="flex flex-col gap-1 text-center sm:text-left">
+                        <a href="{{ route('register') }}" class="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors">Belum punya akun? Daftar</a>
+                        <a href="{{ route('password.request') }}" class="text-xs text-gray-500 hover:text-blue-500 transition-colors">Lupa passsword?</a>
+                    </div>
                     <button type="submit" class="w-full sm:w-auto px-8 py-2.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-semibold text-sm rounded-md shadow-sm transition-all transform active:scale-95">
                         Login
                     </button>
