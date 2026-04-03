@@ -91,19 +91,32 @@ class SeleksiController extends Controller
             'nama_periode' => ['required', 'string', 'max:100'],
         ]);
 
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
-            // 1. Data Fetching (Ambil semua pendaftar aktif)
-            $pendaftar = User::where('role', 'PENDAFTAR')->with(['berkas', 'seleksis'])->get();
-            
-            if ($pendaftar->isEmpty()) {
-                return back()->with('error', 'Tidak ada data pendaftar yang bisa diarsipkan.');
-            }
+        // 1. Data Fetching (Ambil semua pendaftar aktif)
+        $pendaftar = User::where('role', 'PENDAFTAR')->with(['berkas', 'seleksis'])->get();
+        
+        if ($pendaftar->isEmpty()) {
+            return back()->with('error', 'Tidak ada data pendaftar yang bisa diarsipkan.');
+        }
 
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $pendaftar) {
             // 2. Summarizing & Snapshotting
             $totalPendaftar = $pendaftar->count();
             $totalLulus = 0;
             $totalTidakLulus = 0;
-            $dataJson = [];
+
+            // 3. Permanent Archiving (Header)
+            $activePeriod = \App\Models\SelectionPeriod::where('status', 'AKTIF')->first();
+
+            $arsipInduk = \App\Models\ArsipSeleksi::create([
+                'nama_periode'      => $request->nama_periode,
+                'deskripsi'         => $activePeriod->deskripsi ?? 'Arsip Otomatis',
+                'tanggal_buka'      => $activePeriod->tanggal_buka ?? now(),
+                'tanggal_tutup'     => $activePeriod->tanggal_tutup ?? now(),
+                'total_pendaftar'   => $totalPendaftar,
+                'total_lulus'       => 0, // Will be updated after loop
+                'total_tidak_lulus' => 0, // Will be updated after loop
+                'tanggal_arsip'     => now(),
+            ]);
 
             foreach ($pendaftar as $p) {
                 $status = $p->seleksis->first()->status_seleksi ?? 'MENUNGGU';
@@ -113,37 +126,33 @@ class SeleksiController extends Controller
                 $totalNilai = ($p->nilai_smt1 ?? 0) + ($p->nilai_smt2 ?? 0) + ($p->nilai_smt3 ?? 0) + ($p->nilai_smt4 ?? 0) + ($p->nilai_smt5 ?? 0);
                 $avg = $totalNilai > 0 ? $totalNilai / 5 : 0;
 
-                $dataJson[] = [
+                // 4. Per Baris Simpan ke SQL sebagai Detail (Dinamis)
+                \App\Models\ArsipPendaftar::create([
+                    'arsip_seleksi_id'  => $arsipInduk->id_arsip,
                     'nomor_pendaftaran' => $p->nomor_pendaftaran,
                     'nama'              => $p->nama_pendaftar ?? $p->username,
                     'nisn'              => $p->nisn_pendaftar,
-                    'rata_rata_nilai'   => number_format($avg, 2),
+                    'rata_rata_nilai'   => $avg,
                     'status_seleksi'    => $status,
-                ];
+                ]);
             }
 
-            // 3. Permanent Archiving
-            \App\Models\ArsipSeleksi::create([
-                'nama_periode'      => $request->nama_periode,
-                'total_pendaftar'   => $totalPendaftar,
+            // Update stats back to Header
+            $arsipInduk->update([
                 'total_lulus'       => $totalLulus,
                 'total_tidak_lulus' => $totalTidakLulus,
-                'data_pendaftar'    => $dataJson,
-                'tanggal_arsip'     => now(),
             ]);
 
-            // 4. Hard Cleanup (Reset System)
-            // Hapus semua data pendaftar (Akun, Berkas, Seleksi via Cascading atau Manual)
-            // Karena kita menggunakan role: PENDAFTAR, kita filter.
+            // 5. Hard Cleanup (Reset System)
             foreach ($pendaftar as $p) {
-                $p->delete(); // Ini akan menghapus berkas dan seleksi terkait jika ada cascading, atau manual jika tidak.
+                $p->delete(); 
             }
-
-            // Kosongkan tabel Periode jika ada (Opsional, user minta hapus SelectionPeriod)
-            \App\Models\SelectionPeriod::truncate();
-
-            return redirect()->route('admin.seleksi')->with('success', 'Periode seleksi telah berhasil diarsipkan secara permanen dan sistem telah di-reset untuk periode baru.');
         });
+
+        // 5. Cleanup Periods (DDL outside transaction to prevent implicit commit issues)
+        \App\Models\SelectionPeriod::truncate();
+
+        return redirect()->route('admin.seleksi')->with('success', 'Periode seleksi telah berhasil diarsipkan secara permanen dan sistem telah di-reset untuk periode baru.');
     }
 
     /**

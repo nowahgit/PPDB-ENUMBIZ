@@ -3,7 +3,7 @@
 @section('title', 'Manajemen Staf Panitia — Enumbiz')
 
 @section('content')
-<div class="space-y-8 max-w-6xl">
+<div class="space-y-8 w-full">
     
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-1 border-b border-[#f1f5f9] pb-6">
         <div class="flex flex-col gap-1">

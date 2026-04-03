@@ -15,15 +15,30 @@ class BerkasController extends Controller
     public function index()
     {
         $berkas = Auth::user()->berkas;
+
+        // Cek apakah data sudah divalidasi VALID
+        if ($berkas && $berkas->status_validasi === 'VALID') {
+            session()->flash('info', 'Data berkas Anda telah divalidasi oleh Admin dan sudah tidak dapat diubah.');
+        }
+
         return view('pendaftar.berkas', compact('berkas'));
     }
 
     /** Simpan/Update Data Diri & Nilai Rapor (Dijalankan dari halaman Data Diri). */
     public function storeIdentity(Request $request)
     {
+        $user = Auth::user();
+        $berkas = $user->berkas;
+
+        // Perbaikan 1: Lock Data VALID
+        if ($berkas && $berkas->status_validasi === 'VALID') {
+            return back()->with('error', 'Maaf, data Anda sudah divalidasi (VALID) dan tidak dapat diubah lagi.');
+        }
+
         $request->validate([
             'nisn_pendaftar'         => ['required', 'string', 'max:20'],
             'nama_pendaftar'         => ['required', 'string', 'max:50'],
+            'jenis_kelamin'          => ['required', 'in:LAKI-LAKI,PEREMPUAN'],
             'tanggallahir_pendaftar' => ['required', 'date'],
             'alamat_pendaftar'       => ['required', 'string'],
             'agama'                  => ['required', 'in:Islam,Kristen,Katolik,Hindu,Buddha,Konghucu'],
@@ -52,6 +67,7 @@ class BerkasController extends Controller
         $user->update([
             'nisn_pendaftar'         => $request->nisn_pendaftar,
             'nama_pendaftar'         => $request->nama_pendaftar,
+            'jenis_kelamin'          => $request->jenis_kelamin,
             'tanggallahir_pendaftar' => $request->tanggallahir_pendaftar,
             'alamat_pendaftar'       => $request->alamat_pendaftar,
             'agama'                  => $request->agama,
@@ -99,6 +115,14 @@ class BerkasController extends Controller
     /** Unggah Dokumen Fisik (KK, Akte, SKL). */
     public function storeDocuments(Request $request)
     {
+        $user = Auth::user();
+        $berkas = $user->berkas;
+
+        // Perbaikan 1: Lock Data VALID
+        if ($berkas && $berkas->status_validasi === 'VALID') {
+            return back()->with('error', 'Maaf, berkas Anda sudah divalidasi (VALID) dan tidak dapat diperbarui lagi.');
+        }
+
         $request->validate([
             'file_kk'   => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
             'file_akte' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],

@@ -3,7 +3,7 @@
 @section('title', 'Detail Pendaftar — Admin Panel')
 
 @section('content')
-<div class="space-y-8 max-w-5xl">
+<div class="space-y-8 w-full">
     
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="flex flex-col gap-1">
@@ -44,6 +44,10 @@
                     <div class="space-y-1">
                         <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Nama Lengkap</p>
                         <p class="text-sm font-bold text-[#111827]">{{ $user->nama_pendaftar ?? $user->username }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Jenis Kelamin</p>
+                        <p class="text-sm font-bold text-[#111827]">{{ $user->jenis_kelamin ?? '-' }}</p>
                     </div>
                     <div class="space-y-1">
                         <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">NISN</p>

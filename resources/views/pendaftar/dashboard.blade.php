@@ -11,6 +11,8 @@
         <p class="text-sm text-[#6b7280]">Selamat datang, {{ $user->berkas->nama_pendaftar ?? $user->username }}. Pantau status PPDB Anda di sini.</p>
     </div>
 
+    @include('components.stepper')
+
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         

@@ -36,9 +36,13 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                             </svg>
                         </div>
-                        <input type="text" name="username" value="{{ old('username') }}" 
+                        <input type="text" name="username" id="username" value="{{ old('username') }}" 
                             class="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition-all text-gray-700 placeholder-gray-400 shadow-sm"
-                            placeholder="Username" required autofocus>
+                            placeholder="Username" required autofocus maxlength="20">
+                    </div>
+                    <div class="flex justify-between items-center px-1">
+                        <p class="text-[10px] text-gray-500 font-medium italic">Hanya huruf & angka saja. Tanpa spasi.</p>
+                        <span id="username-counter" class="text-[10px] font-bold text-gray-400">0/20</span>
                     </div>
                     @error('username') <p class="text-xs text-red-500 font-medium ml-1">{{ $message }}</p> @enderror
                 </div>
@@ -57,6 +61,20 @@
                             placeholder="Email (Opsional)">
                     </div>
                     @error('email') <p class="text-xs text-red-500 font-medium ml-1">{{ $message }}</p> @enderror
+                </div>
+
+                <!-- NISN (Required per Perbaikan 4) -->
+                <div class="space-y-1">
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                            <!-- ID Card Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" /></svg>
+                        </div>
+                        <input type="text" name="nisn_pendaftar" value="{{ old('nisn_pendaftar') }}" 
+                            class="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition-all text-gray-700 placeholder-gray-400 shadow-sm"
+                            placeholder="Masukkan NISN Siswa" required>
+                    </div>
+                    @error('nisn_pendaftar') <p class="text-xs text-red-500 font-medium ml-1">{{ $message }}</p> @enderror
                 </div>
 
                 <!-- Asal Sekolah (Optional) -->
@@ -129,5 +147,38 @@
         &copy; 2026 ENUMBIZ SCHOOL — ALL RIGHTS RESERVED
     </div>
 
+    <script>
+        const usernameInput = document.getElementById('username');
+        const counterDisplay = document.getElementById('username-counter');
+
+        usernameInput.addEventListener('keypress', function(e) {
+            // Block anything that isn't alpha_num
+            const char = String.fromCharCode(e.which);
+            if (!/[a-zA-Z0-0]/.test(char)) {
+                e.preventDefault();
+            }
+        });
+
+        usernameInput.addEventListener('input', function() {
+            // Clean up if pasted
+            this.value = this.value.replace(/[^a-zA-Z0-9]/g, '');
+            
+            // Counter
+            const current = this.value.length;
+            counterDisplay.innerText = `${current}/20`;
+            
+            // Visual Indicator
+            if (current > 0 && current < 5) {
+                counterDisplay.classList.add('text-red-500');
+                counterDisplay.classList.remove('text-green-500', 'text-gray-400');
+            } else if (current >= 5) {
+                counterDisplay.classList.add('text-green-500');
+                counterDisplay.classList.remove('text-red-500', 'text-gray-400');
+            } else {
+                counterDisplay.classList.add('text-gray-400');
+                counterDisplay.classList.remove('text-green-500', 'text-red-500');
+            }
+        });
+    </script>
 </body>
 </html>

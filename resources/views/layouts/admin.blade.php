@@ -95,8 +95,8 @@
     </header>
 
     <!-- Main Content -->
-    <main class="lg:ml-64 pt-16 lg:pt-0 min-h-screen transition-opacity duration-200">
-        <div class="p-6 lg:p-10">
+    <main class="lg:ml-64 pt-16 lg:pt-0 min-h-screen transition-opacity duration-200 flex flex-col">
+        <div class="p-6 lg:p-10 flex-1 w-full">
             @yield('content')
         </div>
     </main>

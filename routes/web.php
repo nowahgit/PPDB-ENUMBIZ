@@ -45,9 +45,9 @@ Route::middleware('auth')->group(function () {
             
             // Berkas & Data Diri
             Route::get('/berkas', [BerkasController::class, 'index'])->name('berkas');
-            Route::post('/berkas', [BerkasController::class, 'storeDocuments'])->name('berkas.store');
+            Route::post('/berkas', [BerkasController::class, 'storeDocuments'])->name('berkas.store')->middleware('register_period');
             Route::get('/data-diri', [DataDiriController::class, 'index'])->name('data-diri');
-            Route::post('/data-diri', [BerkasController::class, 'storeIdentity'])->name('data-diri.store');
+            Route::post('/data-diri', [BerkasController::class, 'storeIdentity'])->name('data-diri.store')->middleware('register_period');
 
             // Hasil Seleksi
             Route::get('/status-seleksi', [SeleksiController::class, 'pendaftarStatus'])->name('status-seleksi');

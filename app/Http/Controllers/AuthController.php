@@ -63,9 +63,12 @@ class AuthController extends Controller
             'password'     => ['required', 'confirmed', Rules\Password::defaults()],
             'email'        => ['nullable', 'email', 'unique:users', 'max:100'],
             'asal_sekolah' => ['nullable', 'string', 'max:100'],
+            'nisn_pendaftar' => ['required', 'string', 'max:20', 'unique:users,nisn_pendaftar'],
         ], [
-            'username.unique' => 'Username sudah digunakan.',
-            'username.alpha_num' => 'Username hanya boleh berisi huruf dan angka.',
+            'username.unique' => 'Username sudah digunakan, silakan pilih yang lain.',
+            'username.alpha_num' => 'Username hanya boleh berisi huruf dan angka tanpa spasi.',
+            'nisn_pendaftar.unique' => 'NISN ini sudah terdaftar. Jika Anda merasa ini kesalahan, hubungi panitia.',
+            'nisn_pendaftar.required' => 'NISN wajib diisi untuk proses seleksi.',
         ]);
 
         $user = User::create([
@@ -74,6 +77,7 @@ class AuthController extends Controller
             'role'         => 'PENDAFTAR',
             'email'        => $request->email,
             'asal_sekolah' => $request->asal_sekolah,
+            'nisn_pendaftar' => $request->nisn_pendaftar,
         ]);
 
         Auth::login($user);

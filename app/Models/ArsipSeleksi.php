@@ -17,19 +17,26 @@ class ArsipSeleksi extends Model
 
     protected $fillable = [
         'nama_periode',
+        'deskripsi',
+        'tanggal_buka',
+        'tanggal_tutup',
         'total_pendaftar',
         'total_lulus',
         'total_tidak_lulus',
-        'data_pendaftar',
         'tanggal_arsip',
     ];
 
     protected function casts(): array
     {
         return [
+            'tanggal_buka'    => 'datetime',
+            'tanggal_tutup'   => 'datetime',
             'tanggal_arsip'   => 'datetime',
-            // JSON column automatically decoded to / encoded from PHP array
-            'data_pendaftar'  => 'array',
         ];
+    }
+
+    public function detailPendaftar()
+    {
+        return $this->hasMany(ArsipPendaftar::class, 'arsip_seleksi_id', 'id_arsip');
     }
 }

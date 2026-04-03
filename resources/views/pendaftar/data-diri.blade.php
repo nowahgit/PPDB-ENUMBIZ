@@ -3,15 +3,25 @@
 @section('title', 'Data Diri — Enumbiz School')
 
 @section('content')
-<div class="space-y-8 max-w-5xl">
+<div class="space-y-8 w-full">
     
     <div class="flex flex-col gap-1">
         <h1 class="text-2xl font-bold text-[#111827]">Lengkapi Data Diri & Nilai Rapor</h1>
         <p class="text-sm text-[#6b7280]">Pastikan data yang Anda masukkan sudah sesuai dengan dokumen asli.</p>
     </div>
 
+    @include('components.stepper')
+
     <form action="{{ route('pendaftar.data-diri.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8 pb-12">
         @csrf
+        
+        @if($user->berkas && $user->berkas->status_validasi === 'VALID')
+            <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 border border-blue-200 flex items-center gap-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0v2m0-2h2m-2 0h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                <span><strong>Data Terkunci:</strong> Dokumen Anda telah divalidasi oleh panitia. Data tidak dapat diubah lagi.</span>
+            </div>
+            <fieldset disabled>
+        @endif
 
         <!-- Section 1: Data Diri -->
         <div class="bg-white border border-[#e2e8f0] rounded-lg shadow-sm">
@@ -26,7 +36,15 @@
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-bold text-[#374151]">Nama Lengkap</label>
-                    <input type="text" name="nama_pendaftar" value="{{ old('nama_pendaftar', $user->berkas->nama_pendaftar ?? $user->username) }}" class="border border-[#d1d5db] rounded-md text-sm py-2.5 px-3 focus:border-[#1e3a8a] outline-none" required>
+                    <input type="text" name="nama_pendaftar" value="{{ old('nama_pendaftar', $user->nama_pendaftar ?? $user->username) }}" class="border border-[#d1d5db] rounded-md text-sm py-2.5 px-3 focus:border-[#1e3a8a] outline-none" required>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-[#374151]">Jenis Kelamin</label>
+                    <select name="jenis_kelamin" class="border border-[#d1d5db] rounded-md text-sm py-2.5 px-3 focus:border-[#1e3a8a] outline-none bg-white" required>
+                        <option value="">Pilih Jenis Kelamin</option>
+                        <option value="LAKI-LAKI" {{ old('jenis_kelamin', $user->jenis_kelamin) == 'LAKI-LAKI' ? 'selected' : '' }}>LAKI-LAKI</option>
+                        <option value="PEREMPUAN" {{ old('jenis_kelamin', $user->jenis_kelamin) == 'PEREMPUAN' ? 'selected' : '' }}>PEREMPUAN</option>
+                    </select>
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-bold text-[#374151]">Tanggal Lahir</label>
@@ -81,10 +99,39 @@
                 @foreach(['nilai_smt1' => 'Smt 1', 'nilai_smt2' => 'Smt 2', 'nilai_smt3' => 'Smt 3', 'nilai_smt4' => 'Smt 4', 'nilai_smt5' => 'Smt 5'] as $key => $label)
                     <div class="flex flex-col gap-1.5">
                         <label class="text-xs font-bold text-[#374151]">{{ $label }}</label>
-                        <input type="number" step="0.01" min="0" max="100" name="{{ $key }}" value="{{ old($key, $seleksi->$key ?? '') }}" class="border border-[#d1d5db] rounded-md text-sm py-2.5 px-3 focus:border-[#1e3a8a] outline-none" required placeholder="00.00">
+                        <input type="text" name="{{ $key }}" value="{{ old($key, $seleksi->$key ?? '') }}" 
+                            class="score-input border border-[#d1d5db] rounded-md text-sm py-2.5 px-3 focus:border-[#1e3a8a] outline-none" 
+                            required placeholder="85.50">
+                        <span class="text-[9px] text-gray-400 font-medium italic">Gunakan titik ( . )</span>
                     </div>
                 @endforeach
             </div>
+            <div id="score-error" class="px-6 pb-4 hidden text-[10px] text-red-600 font-bold uppercase tracking-tight">Format nilai tidak valid (Gunakan . dan range 0-100)</div>
+
+            <script>
+                document.querySelectorAll('.score-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const errorDiv = document.getElementById('score-error');
+                        // Only numbers and dot
+                        this.value = this.value.replace(/[^0-9.]/g, '');
+                        
+                        // Limit to 1 dot
+                        if ((this.value.match(/\./g) || []).length > 1) {
+                            this.value = this.value.replace(/\.+$/, "");
+                        }
+
+                        // Validate Range
+                        const val = parseFloat(this.value);
+                        if (val > 100 || isNaN(val) && this.value !== '') {
+                            this.classList.add('border-red-500');
+                            errorDiv.classList.remove('hidden');
+                        } else {
+                            this.classList.remove('border-red-500');
+                            errorDiv.classList.add('hidden');
+                        }
+                    });
+                });
+            </script>
         </div>
 
         <!-- Section 4: Prestasi Mandiri (Opsional) -->
@@ -114,11 +161,18 @@
             </div>
         </div>
 
-        <div class="flex justify-end transition-opacity duration-200">
-            <button type="submit" class="w-full md:w-auto md:px-12 bg-[#1e3a8a] hover:bg-blue-800 text-white font-bold h-12 rounded shadow-sm text-xs uppercase tracking-wider">
-                Simpan & Update Data Diri
-            </button>
-        </div>
+        @if($user->berkas && $user->berkas->status_validasi === 'VALID')
+            <div class="bg-gray-100 p-4 border rounded text-center text-xs font-bold text-gray-500 uppercase tracking-widest">
+                DATA TIDAK DAPAT DIUBAH (VALID)
+            </div>
+            </fieldset>
+        @else
+            <div class="flex justify-end transition-opacity duration-200">
+                <button type="submit" class="w-full md:w-auto md:px-12 bg-[#1e3a8a] hover:bg-blue-800 text-white font-bold h-12 rounded shadow-sm text-xs uppercase tracking-wider">
+                    Simpan & Update Data Diri
+                </button>
+            </div>
+        @endif
 
     </form>
 </div>
