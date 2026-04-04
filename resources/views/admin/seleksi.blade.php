@@ -28,6 +28,17 @@
         <div class="p-4 bg-red-50/50 border-l-4 border-red-500 rounded text-sm font-bold text-red-700 shadow-sm">{{ session('error') }}</div>
     @endif
 
+    @if($errors->any())
+        <div class="p-4 bg-red-50/50 border-l-4 border-red-500 rounded text-sm font-bold text-red-700 shadow-sm">
+            <p>Terjadi kesalahan validasi:</p>
+            <ul class="list-disc list-inside mt-1 font-medium italic">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <!-- 1. Kondisi Periode Aktif & Kontrol Utarma -->
     @php
         $activePeriod = collect($periods)->first(fn($p) => $p->status === 'AKTIF' && now()->between($p->tanggal_buka, $p->tanggal_tutup));

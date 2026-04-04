@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'  => \App\Http\Middleware\RoleMiddleware::class,
             'guest.redirect' => \App\Http\Middleware\GuestMiddleware::class,
             'register_period' => \App\Http\Middleware\CheckRegistrationPeriod::class,
+            'prevent-back' => \App\Http\Middleware\PreventBackHistory::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

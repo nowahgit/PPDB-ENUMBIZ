@@ -121,9 +121,20 @@
             <!-- Left Side: Copywriting (1st in DOM, Bottom on Mobile, Left on Desktop) -->
             <div class="space-y-6 z-10">
 
+                @php
+                    $isRegistrationOpen = \App\Models\SelectionPeriod::where('status', 'AKTIF')
+                        ->where('tanggal_buka', '<=', now())
+                        ->where('tanggal_tutup', '>=', now())
+                        ->exists();
+                @endphp
+
 
                 <h1 class="text-4xl lg:text-5xl font-extrabold leading-[1.1] tracking-tight title-text mb-4">
-                    Raih masa depanmu di Portal PPDB Enumbiz
+                    @if($isRegistrationOpen)
+                        Raih masa depanmu di Portal PPDB Enumbiz
+                    @else
+                        Portal belum dibuka, masa depan menunggumu
+                    @endif
                 </h1>
 
                 <p class="text-snpmb-gray text-base lg:text-lg max-w-lg leading-relaxed">
@@ -143,15 +154,17 @@
                             </svg>
                         </a>
                     @else
-                        <a href="{{ route('register') }}"
-                            class="btn-snpmb-blue text-white px-6 py-3 rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
-                            Mulai Pendaftaran
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </a>
+                        @if($isRegistrationOpen)
+                            <a href="{{ route('register') }}"
+                                class="btn-snpmb-blue text-white px-6 py-3 rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
+                                Mulai Pendaftaran
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </a>
+                        @endif
                         <a href="{{ route('login') }}"
                             class="btn-snpmb-dark border border-gray-200 dark:border-gray-700/50 text-gray-700 dark:text-white px-6 py-3 rounded-lg text-sm font-bold transition-colors">
                             Sudah Memiliki Akun? Masuk

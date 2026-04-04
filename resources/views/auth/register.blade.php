@@ -41,7 +41,7 @@
                             placeholder="Username" required autofocus maxlength="20">
                     </div>
                     <div class="flex justify-between items-center px-1">
-                        <p class="text-[10px] text-gray-500 font-medium italic">Hanya huruf & angka saja. Tanpa spasi.</p>
+                        <p class="text-[10px] text-gray-500 font-medium italic">Hanya huruf. Tanpa spasi.</p>
                         <span id="username-counter" class="text-[10px] font-bold text-gray-400">0/20</span>
                     </div>
                     @error('username') <p class="text-xs text-red-500 font-medium ml-1">{{ $message }}</p> @enderror

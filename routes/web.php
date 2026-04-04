@@ -39,7 +39,7 @@ Route::middleware('guest.redirect')->group(function () {
 | Private Routes (Harus Login)
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'prevent-back'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // ─── Grup PENDAFTAR (prefix /dashboard) ─────────────────────────

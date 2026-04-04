@@ -26,7 +26,7 @@ class SeleksiController extends Controller
     {
         $users = User::where('role', 'PENDAFTAR')->with(['berkas', 'seleksis'])->latest()->paginate(20);
         $periods = \App\Models\SelectionPeriod::orderBy('id_periode', 'desc')->get();
-        $archives = \App\Models\ArsipSeleksi::orderBy('tanggal_arsip', 'desc')->get();
+        $archives = \App\Models\ArsipSeleksi::with('detailPendaftar')->orderBy('tanggal_arsip', 'desc')->get();
 
         return view('admin.seleksi', compact('users', 'periods', 'archives'));
     }
@@ -78,7 +78,7 @@ class SeleksiController extends Controller
      */
     public function archiveIndex()
     {
-        $archives = \App\Models\ArsipSeleksi::orderBy('tanggal_arsip', 'desc')->get();
+        $archives = \App\Models\ArsipSeleksi::with('detailPendaftar')->orderBy('tanggal_arsip', 'desc')->get();
         return view('admin.arsip', compact('archives'));
     }
 
@@ -87,8 +87,16 @@ class SeleksiController extends Controller
      */
     public function archiveStore(Request $request)
     {
+        $activePeriod = \App\Models\SelectionPeriod::where('status', 'AKTIF')->first();
+
+        if (!$activePeriod) {
+            return back()->with('error', 'Tidak ada periode aktif yang bisa diarsipkan.');
+        }
+
         $request->validate([
-            'nama_periode' => ['required', 'string', 'max:100'],
+            'nama_periode' => ['required', 'string', 'in:' . $activePeriod->nama_periode],
+        ], [
+            'nama_periode.in' => 'Konfirmasi nama periode tidak cocok. Harap ketik ulang sesuai nama periode aktif.',
         ]);
 
         // 1. Data Fetching (Ambil semua pendaftar aktif)
@@ -98,17 +106,15 @@ class SeleksiController extends Controller
             return back()->with('error', 'Tidak ada data pendaftar yang bisa diarsipkan.');
         }
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $pendaftar) {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $activePeriod, $pendaftar) {
             // 2. Summarizing & Snapshotting
             $totalPendaftar = $pendaftar->count();
             $totalLulus = 0;
             $totalTidakLulus = 0;
 
             // 3. Permanent Archiving (Header)
-            $activePeriod = \App\Models\SelectionPeriod::where('status', 'AKTIF')->first();
-
             $arsipInduk = \App\Models\ArsipSeleksi::create([
-                'nama_periode'      => $request->nama_periode,
+                'nama_periode'      => $activePeriod->nama_periode,
                 'deskripsi'         => $activePeriod->deskripsi ?? 'Arsip Otomatis',
                 'tanggal_buka'      => $activePeriod->tanggal_buka ?? now(),
                 'tanggal_tutup'     => $activePeriod->tanggal_tutup ?? now(),

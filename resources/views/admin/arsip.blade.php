@@ -49,7 +49,7 @@
                         <div class="pt-4 mt-auto">
                             <button @click="selectedArchive = {{ json_encode($archive) }}" 
                                     class="w-full bg-[#1e3a8a] text-white py-3 rounded text-[10px] font-black uppercase tracking-[.2em] hover:bg-black transition-all shadow-lg shadow-blue-900/20">
-                                Detail Dokumen JSON
+                                Detail Dokumen SQL
                             </button>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
             <div class="p-5 border-b border-[#f1f5f9] flex justify-between items-center bg-slate-50">
                 <div class="flex items-center gap-3">
                     <h3 class="text-sm font-bold text-[#111827] uppercase tracking-widest" x-text="'Snapshot: ' + selectedArchive?.nama_periode"></h3>
-                    <span class="text-[10px] font-mono bg-blue-100 text-[#1e3a8a] px-2 py-0.5 rounded">JSON Static Mode</span>
+                    <span class="text-[10px] font-mono bg-blue-100 text-[#1e3a8a] px-2 py-0.5 rounded">SQL Database Mode</span>
                 </div>
                 <button @click="selectedArchive = null" class="text-gray-400 hover:text-black">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -82,7 +82,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[#f1f5f9]">
-                        <template x-for="p in selectedArchive?.data_pendaftar" :key="p.nomor_pendaftaran">
+                        <template x-for="p in selectedArchive?.detail_pendaftar" :key="p.nomor_pendaftaran">
                             <tr class="hover:bg-slate-50">
                                 <td class="px-6 py-4">
                                     <p class="font-mono text-[#1e3a8a] font-bold" x-text="p.nomor_pendaftaran"></p>

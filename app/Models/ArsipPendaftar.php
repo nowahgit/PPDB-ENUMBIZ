@@ -20,6 +20,6 @@ class ArsipPendaftar extends Model
 
     public function arsipInduk()
     {
-        return $this->belongsTo(ArsipSeleksi::class, 'arsip_seleksi_id', 'id_arsip');
+        return $this->belongsTo(ArsipSeleksi::class, 'arsip_seleksi_id', 'id');
     }
 }

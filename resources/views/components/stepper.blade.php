@@ -15,17 +15,17 @@
         ],
         [
             'label' => 'Data Diri & Rapor',
-            'status' => $user->nisn_pendaftar ? 'completed' : 'current',
+            'status' => ($user->nisn_pendaftar && $user->nama_ortu && $user->alamat_pendaftar) ? 'completed' : 'current',
             'icon' => '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>'
         ],
         [
             'label' => 'Unggah Berkas',
-            'status' => ($user->berkas && $user->berkas->file_kk) ? 'completed' : ($user->nisn_pendaftar ? 'current' : 'pending'),
+            'status' => ($user->berkas && $user->berkas->file_path != '') ? 'completed' : (($user->nisn_pendaftar && $user->nama_ortu && $user->alamat_pendaftar) ? 'current' : 'pending'),
             'icon' => '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>'
         ],
         [
             'label' => 'Verifikasi Admin',
-            'status' => ($user->berkas && $user->berkas->status_validasi !== 'MENUNGGU') ? 'completed' : (($user->berkas && $user->berkas->file_kk) ? 'current' : 'pending'),
+            'status' => ($user->berkas && $user->berkas->status_validasi !== 'MENUNGGU') ? 'completed' : (($user->berkas && $user->berkas->file_path != '') ? 'current' : 'pending'),
             'icon' => '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
         ],
     ];

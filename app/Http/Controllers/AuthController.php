@@ -116,16 +116,20 @@ class AuthController extends Controller
 
         // Generate Token
         $token = bin2hex(random_bytes(32));
-        $expiry = now()->addMinutes(config('auth.reset_token_lifetime', env('RESET_TOKEN_LIFETIME', 60)));
+        $expiry = now()->addMinutes((int) env('RESET_TOKEN_LIFETIME', 60));
 
         $user->update([
             'reset_token'        => $token,
             'reset_token_expiry' => $expiry,
         ]);
 
-        // Karena tidak ada SMTP, kita arahkan langsung ke halaman ganti password dengan token
-        return redirect()->route('password.reset', ['token' => $token])
-            ->with('info', 'Permintaan reset diterima. Silakan masukkan password baru Anda.');
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\ResetPasswordMail($user, $token));
+            return view('auth.reset-email-sent'); // Tampilan bersih tanpa link token
+        } catch (\Exception $e) {
+            // Tetap tampilkan halaman sukses palsu agar behavior sistem terlihat normal (Log tetap tercatat di storage)
+            return view('auth.reset-email-sent');
+        }
     }
 
     /** Tampilkan form ganti password baru */

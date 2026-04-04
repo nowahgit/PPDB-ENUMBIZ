@@ -39,7 +39,7 @@
                             placeholder="Username" required autofocus>
                     </div>
                     @if($errors->has('username'))
-                        <p class="text-xs text-red-500 font-medium ml-1">Username harus diisi</p>
+                        <p class="text-xs text-red-500 font-medium ml-1">{{ $errors->first('username') }}</p>
                     @endif
                 </div>
 
@@ -56,7 +56,7 @@
                             placeholder="Password" required>
                     </div>
                     @if($errors->has('password'))
-                        <p class="text-xs text-red-500 font-medium ml-1">Password harus diisi</p>
+                        <p class="text-xs text-red-500 font-medium ml-1">{{ $errors->first('password') }}</p>
                     @endif
                     @if($errors->any() && !$errors->has('username') && !$errors->has('password'))
                          <p class="text-xs text-red-500 font-medium ml-1">Terjadi kesalahan. Silakan cek data Anda.</p>

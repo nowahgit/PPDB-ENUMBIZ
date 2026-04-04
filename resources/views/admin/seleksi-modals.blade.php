@@ -16,21 +16,34 @@
 </div>
 
 <!-- Modal Konfirmasi Arsip -->
-<div x-show="showArchiveConfirm" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111827]/60 backdrop-blur-sm" style="display: none;" x-transition x-cloak>
+@if($activePeriod)
+<div x-show="showArchiveConfirm" x-data="{ confirmInput: '' }" 
+     x-init="$watch('showArchiveConfirm', value => { if(!value) confirmInput = '' })"
+     class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111827]/60 backdrop-blur-sm" style="display: none;" x-transition x-cloak>
     <div class="bg-white border border-[#e2e8f0] rounded-lg shadow-2xl w-full max-w-sm overflow-hidden" @click.away="showArchiveConfirm = false">
         <div class="p-4 border-b border-[#f1f5f9] bg-slate-50 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-red-600">Peringatan: Reset Sistem</div>
         <form action="{{ route('admin.arsip.store') }}" method="POST" class="p-6 space-y-4">
             @csrf
-            <p class="text-[11px] text-gray-500 leading-relaxed text-center">Sistem akan membuat **Arsip JSON permanen** dan **MENGHAPUS SELURUH AKUN PENDAFTAR** serta berkasnya.</p>
-            <div class="space-y-2">
-                <label class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Nama Periode Arsip</label>
-                <input type="text" name="nama_periode" required placeholder="PPDB 2024/2025" 
-                       class="w-full border border-[#d1d5db] rounded px-4 py-2.5 text-sm focus:border-red-500 outline-none bg-slate-50">
+            <div class="text-center space-y-2">
+                <p class="text-[11px] text-gray-500 leading-relaxed">Sistem akan memindahkan seluruh data PPDB ke **Database Arsip SQL Permanen** dan **MENGHAPUS SELURUH AKUN PENDAFTAR**.</p>
+                <p class="text-[10px] font-bold text-red-600 uppercase tracking-widest bg-red-50 py-2 rounded border border-red-100">Ketik "{{ $activePeriod->nama_periode }}" untuk konfirmasi</p>
             </div>
-            <button type="submit" class="w-full px-4 py-3 bg-[#dc2626] text-white rounded text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-colors shadow-lg shadow-red-900/20 uppercase font-black">YA, ARSIPKAN & RESET</button>
+            
+            <div class="space-y-2">
+                <input type="text" name="nama_periode" x-model="confirmInput" required placeholder="Ketik nama periode..." 
+                       class="w-full border border-[#d1d5db] rounded px-4 py-2.5 text-sm focus:border-red-500 outline-none bg-slate-50 text-center font-bold">
+            </div>
+            
+            <button type="submit" 
+                    :disabled="confirmInput !== '{{ $activePeriod->nama_periode }}'"
+                    :class="confirmInput === '{{ $activePeriod->nama_periode }}' ? 'bg-[#dc2626] hover:bg-black opacity-100' : 'bg-gray-300 cursor-not-allowed opacity-50'"
+                    class="w-full px-4 py-3 text-white rounded text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-red-900/20 font-black">
+                YA, ARSIPKAN & RESET
+            </button>
         </form>
     </div>
 </div>
+@endif
 
 <!-- Modal Form Periode (Tambah / Edit) -->
 <div x-show="showAddPeriod" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111827]/60 backdrop-blur-sm" style="display: none;" x-transition x-cloak>
@@ -48,7 +61,7 @@
     </div>
 </div>
 
-<!-- Modal View Archive Detail JSON -->
+<!-- Modal View Archive Detail (SQL) -->
 <div x-show="selectedArchive" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#111827]/60 backdrop-blur-sm" style="display: none;" x-transition x-cloak>
     <div class="bg-white border border-[#e2e8f0] rounded-lg shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col h-[85vh]">
         <div class="p-5 border-b border-[#f1f5f9] flex justify-between items-center bg-slate-50">
@@ -63,7 +76,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#f1f5f9]">
-                    <template x-for="p in selectedArchive?.data_pendaftar" :key="p.nomor_pendaftaran">
+                    <template x-for="p in selectedArchive?.detail_pendaftar" :key="p.nomor_pendaftaran">
                         <tr class="hover:bg-slate-50">
                             <td class="px-6 py-4 font-mono font-bold text-[#1e3a8a]" x-text="p.nomor_pendaftaran"></td>
                             <td class="px-6 py-4 font-bold text-[#111827]" x-text="p.nama"></td>
