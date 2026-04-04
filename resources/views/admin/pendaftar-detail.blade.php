@@ -13,20 +13,35 @@
             <h1 class="text-2xl font-bold text-[#111827] mt-2">Detail Calon Siswa: {{ $user->username }}</h1>
         </div>
 
-        <div class="flex items-center gap-3">
-             <form action="{{ route('admin.seleksi.store') }}" method="POST" class="flex items-center gap-2">
-                @csrf
-                <input type="hidden" name="user_id" value="{{ $user->id }}">
-                <input type="hidden" name="nama_seleksi" value="Validasi Berkas Admin">
-                <input type="hidden" name="waktu_seleksi" value="{{ now() }}">
-                
-                <select name="status_seleksi" class="border border-[#d1d5db] rounded px-4 py-2 text-xs font-bold uppercase tracking-tight focus:border-[#1e3a8a] outline-none bg-white font-sans">
-                    <option value="MENUNGGU" {{ ($user->seleksi->status_seleksi ?? '') == 'MENUNGGU' ? 'selected' : '' }}>MENUNGGU</option>
-                    <option value="LULUS" {{ ($user->seleksi->status_seleksi ?? '') == 'LULUS' ? 'selected' : '' }}>LULUS</option>
-                    <option value="TIDAK_LULUS" {{ ($user->seleksi->status_seleksi ?? '') == 'TIDAK_LULUS' ? 'selected' : '' }}>TIDAK LULUS</option>
-                </select>
-                <button type="submit" class="bg-[#1e3a8a] text-white px-6 py-2 rounded text-xs font-bold uppercase tracking-widest hover:bg-blue-800 transition-colors shadow-sm">Simpan Status</button>
-             </form>
+        <div class="flex flex-wrap items-center gap-4">
+             <!-- 1. Validasi Berkas Form -->
+             <div class="flex items-center gap-2 border-r border-[#e2e8f0] pr-4">
+                 <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-2">Validasi Berkas:</p>
+                 <form action="{{ route('admin.berkas.validate', $user->id) }}" method="POST" class="flex items-center gap-1">
+                    @csrf
+                    <input type="hidden" name="status" id="berkas_status">
+                    <button type="submit" onclick="document.getElementById('berkas_status').value='VALID'" class="px-4 py-2 rounded text-[10px] font-black uppercase tracking-widest transition-all {{ ($user->berkas->status_validasi ?? '') == 'VALID' ? 'bg-green-600 text-white shadow-lg shadow-green-900/20' : 'bg-white border border-green-200 text-green-700 hover:bg-green-50' }}">Valid</button>
+                    <button type="submit" onclick="document.getElementById('berkas_status').value='DITOLAK'" class="px-4 py-2 rounded text-[10px] font-black uppercase tracking-widest transition-all {{ ($user->berkas->status_validasi ?? '') == 'DITOLAK' ? 'bg-red-600 text-white shadow-lg shadow-red-900/20' : 'bg-white border border-red-200 text-red-700 hover:bg-red-50' }}">Tolak</button>
+                 </form>
+             </div>
+
+             <!-- 2. Status Kelulusan (Seleksi) Form -->
+             <div class="flex items-center gap-2">
+                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-2">Status Seleksi:</p>
+                <form action="{{ route('admin.seleksi.store') }}" method="POST" class="flex items-center gap-2">
+                    @csrf
+                    <input type="hidden" name="user_id" value="{{ $user->id }}">
+                    <input type="hidden" name="nama_seleksi" value="Validasi Akhir Panitia">
+                    <input type="hidden" name="waktu_seleksi" value="{{ now() }}">
+                    
+                    <select name="status_seleksi" class="border border-[#d1d5db] rounded px-3 py-2 text-[10px] font-black uppercase tracking-tight focus:border-[#1e3a8a] outline-none bg-white font-sans">
+                        <option value="MENUNGGU" {{ ($user->seleksis->first()->status_seleksi ?? '') == 'MENUNGGU' ? 'selected' : '' }}>MENUNGGU</option>
+                        <option value="LULUS" {{ ($user->seleksis->first()->status_seleksi ?? '') == 'LULUS' ? 'selected' : '' }}>LULUS</option>
+                        <option value="TIDAK_LULUS" {{ ($user->seleksis->first()->status_seleksi ?? '') == 'TIDAK_LULUS' ? 'selected' : '' }}>TIDAK LULUS</option>
+                    </select>
+                    <button type="submit" class="bg-[#1e3a8a] text-white px-5 py-2 rounded text-[10px] font-black uppercase tracking-widest hover:bg-black transition-colors shadow-lg shadow-blue-900/20">Simpan Seleksi</button>
+                </form>
+             </div>
         </div>
     </div>
 

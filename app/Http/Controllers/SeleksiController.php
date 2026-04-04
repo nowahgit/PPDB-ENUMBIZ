@@ -43,7 +43,11 @@ class SeleksiController extends Controller
             'waktu_seleksi' => ['required', 'date'],
         ]);
 
-        $admin = Admin::where('user_id', Auth::id())->firstOrFail();
+        $admin = Admin::where('user_id', Auth::id())->first();
+
+        if (!$admin) {
+            return back()->with('error', 'Profil Panitia tidak ditemukan untuk akun Anda. Harap hubungi Administrator untuk sinkronisasi data Panitia.');
+        }
 
         Seleksi::updateOrCreate(
             ['user_id' => $request->user_id],
@@ -150,9 +154,7 @@ class SeleksiController extends Controller
             ]);
 
             // 5. Hard Cleanup (Reset System)
-            foreach ($pendaftar as $p) {
-                $p->delete(); 
-            }
+            $pendaftar->each->delete(); 
         });
 
         // 5. Cleanup Periods (DDL outside transaction to prevent implicit commit issues)
@@ -182,7 +184,11 @@ class SeleksiController extends Controller
             return back()->with('error', 'Tidak ada data pendaftar dengan BERKAS VALID untuk diseleksi.');
         }
 
-        $admin = Admin::where('user_id', Auth::id())->firstOrFail();
+        $admin = Admin::where('user_id', Auth::id())->first();
+        
+        if (!$admin) {
+            return back()->with('error', 'Profil Panitia tidak ditemukan. Proses seleksi otomatis memerlukan profil panitia yang valid.');
+        }
 
         foreach ($users as $user) {
             $total = ($user->nilai_smt1 ?? 0) + ($user->nilai_smt2 ?? 0) + ($user->nilai_smt3 ?? 0) + ($user->nilai_smt4 ?? 0) + ($user->nilai_smt5 ?? 0);

@@ -113,7 +113,11 @@ class AdminController extends Controller
             'catatan' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $berkas = Berkas::where('user_id', $id)->firstOrFail();
+        $berkas = Berkas::where('user_id', $id)->first();
+        
+        if (!$berkas) {
+            return back()->with('error', 'Data berkas pendaftar tidak ditemukan. Pendaftar mungkin belum melengkapi data diri.');
+        }
         
         $berkas->update([
             'status_validasi'  => $request->status,
