@@ -133,7 +133,7 @@
                     @if($isRegistrationOpen)
                         Raih masa depanmu di Portal PPDB Enumbiz
                     @else
-                        Portal belum dibuka, masa depan menunggumu
+                        Portal belum dibuka, silahkan cek kembali jadwal yang tertera
                     @endif
                 </h1>
 

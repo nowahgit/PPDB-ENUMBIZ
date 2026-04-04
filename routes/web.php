@@ -79,7 +79,7 @@ Route::middleware(['auth', 'prevent-back'])->group(function () {
             Route::get('/pendaftar/{id}/edit', [AdminController::class, 'pendaftarEdit'])->name('pendaftar.edit');
             Route::put('/pendaftar/{id}', [AdminController::class, 'pendaftarUpdate'])->name('pendaftar.update');
             Route::delete('/pendaftar/{id}', [AdminController::class, 'pendaftarDestroy'])->name('pendaftar.destroy');
-            Route::post('/pendaftar/{id}/validate', [AdminController::class, 'validateBerkas'])->name('berkas.validate');
+            Route::post('/pendaftar-validate/{id}', [AdminController::class, 'validateBerkas'])->name('berkas.validate');
             
             // Penilaian Seleksi
             Route::get('/seleksi', [SeleksiController::class, 'adminIndex'])->name('seleksi');

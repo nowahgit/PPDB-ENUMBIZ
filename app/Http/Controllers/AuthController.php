@@ -71,18 +71,30 @@ class AuthController extends Controller
             'nisn_pendaftar.required' => 'NISN wajib diisi untuk proses seleksi.',
         ]);
 
+        // Generate Unique Registration Number (Randomize: Format Tahun + 8 Digit Acak)
+        $registrationNumber = date('Y') . str_pad(mt_rand(1, 99999999), 8, '0', STR_PAD_LEFT);
+        
         $user = User::create([
             'username'     => $request->username,
             'password'     => Hash::make($request->password),
             'role'         => 'PENDAFTAR',
+            'nomor_pendaftaran' => $registrationNumber,
             'email'        => $request->email,
             'asal_sekolah' => $request->asal_sekolah,
             'nisn_pendaftar' => $request->nisn_pendaftar,
         ]);
 
+        // Inisialisasi data pendukung agar dashboard pendaftar & panitia tidak error data NULL
+        \App\Models\Berkas::create(['user_id' => $user->id, 'status_validasi' => 'MENUNGGU']);
+        \App\Models\Seleksi::create([
+            'user_id'       => $user->id, 
+            'status_seleksi'=> 'MENUNGGU', 
+            'nama_seleksi'  => 'PENDAFTARAN PORTAL'
+        ]);
+
         Auth::login($user);
 
-        return redirect('/dashboard')->with('success', 'Akun berhasil dibuat!');
+        return redirect('/dashboard')->with('success', 'Akun berhasil dibuat! Nomor Pendaftaran Anda: ' . $registrationNumber);
     }
 
     /** Proses Logout */

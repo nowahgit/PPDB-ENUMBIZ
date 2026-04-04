@@ -9,12 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('selection_periods', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama', 100)->notNull();
+            $table->id('id_periode');
+            $table->string('nama_periode', 100);
             $table->text('deskripsi')->nullable();
-            $table->dateTime('tanggal_buka')->notNull();
-            $table->dateTime('tanggal_tutup')->notNull();
-            $table->enum('status', ['AKTIF', 'SELESAI', 'DITUTUP'])->default('AKTIF');
+            $table->dateTime('tanggal_buka');
+            $table->dateTime('tanggal_tutup');
+            $table->enum('status', ['AKTIF', 'TUTUP', 'ARSIP'])->default('AKTIF');
             $table->timestamps();
         });
     }

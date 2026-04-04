@@ -43,6 +43,12 @@ class SeleksiController extends Controller
             'waktu_seleksi' => ['required', 'date'],
         ]);
 
+        // PROTEKSI: Cegah seleksi kelulusan jika berkas DITOLAK
+        $user = User::with('berkas')->findOrFail($request->user_id);
+        if (($user->berkas->status_validasi ?? '') === 'DITOLAK') {
+            return back()->with('error', 'Gagal: Pendaftar ini tidak dapat diseleksi karena berkas pendaftarannya telah DITOLAK.');
+        }
+
         $admin = Admin::where('user_id', Auth::id())->first();
 
         if (!$admin) {
@@ -110,6 +116,15 @@ class SeleksiController extends Controller
             return back()->with('error', 'Tidak ada data pendaftar yang bisa diarsipkan.');
         }
 
+        // 1b. Validation: Check for incomplete data (missing Nomor Pendaftaran)
+        $incomplete = $pendaftar->filter(fn($p) => empty($p->nomor_pendaftaran));
+        if ($incomplete->isNotEmpty() && !$request->has('force_archive')) {
+            $names = $incomplete->take(3)->pluck('username')->implode(', ');
+            $suffix = $incomplete->count() > 3 ? '...' : '';
+            return back()->with('error', "Gagal mengarsipkan: Terdapat {$incomplete->count()} pendaftar ({$names}{$suffix}) yang belum melengkapi data diri sehingga Nomor Pendaftaran belum diterbitkan. Harap minta pendaftar melengkapi data atau hapus akun tersebut sebelum Reset.")
+                        ->with('show_force_option', true); // Hint for frontend to show force option
+        }
+
         \Illuminate\Support\Facades\DB::transaction(function () use ($request, $activePeriod, $pendaftar) {
             // 2. Summarizing & Snapshotting
             $totalPendaftar = $pendaftar->count();
@@ -125,25 +140,35 @@ class SeleksiController extends Controller
                 'total_pendaftar'   => $totalPendaftar,
                 'total_lulus'       => 0, // Will be updated after loop
                 'total_tidak_lulus' => 0, // Will be updated after loop
+                'data_pendaftar'    => [], // Essential: satisfies NOT NULL constraint
                 'tanggal_arsip'     => now(),
             ]);
 
             foreach ($pendaftar as $p) {
-                $status = $p->seleksis->first()->status_seleksi ?? 'MENUNGGU';
-                if ($status === 'LULUS') $totalLulus++;
-                if ($status === 'TIDAK_LULUS') $totalTidakLulus++;
+                // Determine logic for status & nomor
+                $isComplete = !empty($p->nomor_pendaftaran);
+                $origStatus = $p->seleksis->first()->status_seleksi ?? 'MENUNGGU';
+                $finalStatus = $isComplete ? $origStatus : 'TIDAK_LULUS';
+                $n_daftar = $isComplete ? $p->nomor_pendaftaran : 'INCOMPLETE-' . $p->id;
+
+                // Update aggregate stats
+                if ($finalStatus === 'LULUS') {
+                    $totalLulus++;
+                } else {
+                    $totalTidakLulus++;
+                }
 
                 $totalNilai = ($p->nilai_smt1 ?? 0) + ($p->nilai_smt2 ?? 0) + ($p->nilai_smt3 ?? 0) + ($p->nilai_smt4 ?? 0) + ($p->nilai_smt5 ?? 0);
                 $avg = $totalNilai > 0 ? $totalNilai / 5 : 0;
 
                 // 4. Per Baris Simpan ke SQL sebagai Detail (Dinamis)
                 \App\Models\ArsipPendaftar::create([
-                    'arsip_seleksi_id'  => $arsipInduk->id_arsip,
-                    'nomor_pendaftaran' => $p->nomor_pendaftaran,
+                    'arsip_seleksi_id'  => $arsipInduk->id,
+                    'nomor_pendaftaran' => substr($n_daftar, 0, 20),
                     'nama'              => $p->nama_pendaftar ?? $p->username,
-                    'nisn'              => $p->nisn_pendaftar,
+                    'nisn'              => $p->nisn_pendaftar ?? '-',
                     'rata_rata_nilai'   => $avg,
-                    'status_seleksi'    => $status,
+                    'status_seleksi'    => $finalStatus,
                 ]);
             }
 

@@ -234,7 +234,7 @@
         new Chart(genderCtx, {
             type: 'doughnut',
             data: {
-                labels: {!! json_encode($genderChart->pluck('jenis_kelamin')->map(fn($v) => $v == 'L' ? 'LAKI-LAKI' : ($v == 'P' ? 'PEREMPUAN' : 'LAINNYA'))) !!},
+                labels: {!! json_encode($genderChart->pluck('jenis_kelamin')) !!},
                 datasets: [{
                     data: {!! json_encode($genderChart->pluck('total')) !!},
                     backgroundColor: ['#1e3a8a', '#ec4899', '#94a3b8'],

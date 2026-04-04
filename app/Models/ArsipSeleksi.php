@@ -23,6 +23,7 @@ class ArsipSeleksi extends Model
         'total_pendaftar',
         'total_lulus',
         'total_tidak_lulus',
+        'data_pendaftar',
         'tanggal_arsip',
     ];
 
@@ -32,6 +33,7 @@ class ArsipSeleksi extends Model
             'tanggal_buka'    => 'datetime',
             'tanggal_tutup'   => 'datetime',
             'tanggal_arsip'   => 'datetime',
+            'data_pendaftar'  => 'array',
         ];
     }
 

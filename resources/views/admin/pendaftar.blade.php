@@ -143,13 +143,24 @@
                                     <span class="text-[9px] font-black tracking-widest @if($st == 'VALID') text-green-700 @elseif($st == 'DITOLAK') text-red-700 @else text-blue-700 @endif uppercase">
                                         Status: {{ $st }}
                                     </span>
+                                    @php 
+                                        $hasFiles = $user->berkas && ($user->berkas->file_kk || $user->berkas->file_akte || $user->berkas->file_skl);
+                                    @endphp
                                     <div class="flex items-center gap-1">
-                                        <form action="{{ route('admin.berkas.validate', $user->id) }}" method="POST"> @csrf <input type="hidden" name="status" value="VALID">
-                                            <button type="submit" class="bg-green-700 text-white px-3 py-2 font-bold text-[9px] uppercase hover:bg-black transition-none tracking-widest">Ya</button>
-                                        </form>
-                                        <form action="{{ route('admin.berkas.validate', $user->id) }}" method="POST"> @csrf <input type="hidden" name="status" value="DITOLAK">
-                                            <button type="submit" class="bg-red-700 text-white px-3 py-2 font-bold text-[9px] uppercase hover:bg-black transition-none tracking-widest">Tidak</button>
-                                        </form>
+                                        @if($st === 'MENUNGGU')
+                                            <form action="{{ route('admin.berkas.validate', $user->id) }}" method="POST" class="flex gap-1">
+                                                @csrf
+                                                <input type="hidden" name="status" id="val_{{ $user->id }}">
+                                                <button type="submit" 
+                                                        {{ !$hasFiles ? 'disabled' : '' }}
+                                                        onclick="document.getElementById('val_{{ $user->id }}').value='VALID'" 
+                                                        class="{{ $hasFiles ? 'bg-green-700 hover:bg-black' : 'bg-gray-300 cursor-not-allowed' }} text-white px-3 py-2 font-bold text-[9px] uppercase transition-none tracking-widest">Ya</button>
+                                                <button type="submit" 
+                                                        {{ !$hasFiles ? 'disabled' : '' }}
+                                                        onclick="document.getElementById('val_{{ $user->id }}').value='DITOLAK'" 
+                                                        class="{{ $hasFiles ? 'bg-red-700 hover:bg-black' : 'bg-gray-300 cursor-not-allowed' }} text-white px-3 py-2 font-bold text-[9px] uppercase transition-none tracking-widest">Tidak</button>
+                                            </form>
+                                        @endif
                                         <a href="{{ route('admin.pendaftar.edit', $user->id) }}" class="bg-slate-800 text-white px-3 py-2 font-bold text-[9px] uppercase hover:bg-black transition-none tracking-widest">Edit</a>
                                         <form id="del-{{ $user->id }}" action="{{ route('admin.pendaftar.destroy', $user->id) }}" method="POST" class="hidden"> @csrf @method('DELETE') </form>
                                         <button type="button" @click="triggerConfirm('Hapus data pendaftar?', () => document.getElementById('del-{{ $user->id }}').submit())"

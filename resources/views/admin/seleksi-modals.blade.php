@@ -33,6 +33,16 @@
                 <input type="text" name="nama_periode" x-model="confirmInput" required placeholder="Ketik nama periode..." 
                        class="w-full border border-[#d1d5db] rounded px-4 py-2.5 text-sm focus:border-red-500 outline-none bg-slate-50 text-center font-bold">
             </div>
+
+            @if(session('show_force_option'))
+                <div class="p-3 bg-red-50 border border-red-200 rounded flex items-start gap-3">
+                    <input type="checkbox" name="force_archive" id="force_archive" value="1" class="mt-1">
+                    <label for="force_archive" class="text-[10px] text-red-700 leading-tight">
+                        <strong>Tetap Lanjutkan (Sangat Berisiko)</strong><br>
+                        Data yang tidak lengkap akan otomatis dianggap <strong>TIDAK LULUS</strong> dan dihapus selamanya.
+                    </label>
+                </div>
+            @endif
             
             <button type="submit" 
                     :disabled="confirmInput !== '{{ $activePeriod->nama_periode }}'"

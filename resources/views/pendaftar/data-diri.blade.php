@@ -29,6 +29,20 @@
                 <h3 class="text-sm font-bold text-[#111827]">01. Profil Calon Siswa</h3>
             </div>
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                <!-- ID Terverifikasi -->
+                <div class="flex flex-col gap-1.5 md:col-span-2">
+                    <label class="text-[10px] font-black text-[#1e3a8a] uppercase tracking-widest leading-none">Nomor Pendaftaran (ID Resmi Anda)</label>
+                    <div class="flex items-center gap-4 bg-slate-50 border border-slate-200 p-4 rounded-md">
+                        <div class="flex flex-shrink-0 w-12 h-12 bg-blue-900 text-white rounded items-center justify-center shadow-lg">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-lg font-black text-slate-800 tracking-widest leading-none">{{ $user->nomor_pendaftaran }}</span>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-tighter">Gunakan nomor ini untuk verifikasi kartu ujian dan pengumuman.</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-bold text-[#374151]">NISN</label>
                     <input type="text" name="nisn_pendaftar" value="{{ old('nisn_pendaftar', $user->berkas->nisn_pendaftar ?? '') }}" class="border border-[#d1d5db] rounded-md text-sm py-2.5 px-3 focus:border-[#1e3a8a] outline-none" required>

@@ -36,27 +36,30 @@ class AdminController extends Controller
             ->take(5)
             ->get();
 
-        // Chart 1: Jenis Kelamin
-        $genderChart = User::where('role', 'PENDAFTAR')
-            ->selectRaw('count(*) as total, jenis_kelamin')
-            ->groupBy('jenis_kelamin')
-            ->get();
-
-        // Chart 2: Umur
-        $ageChart = User::where('role', 'PENDAFTAR')
-            ->whereNotNull('tanggallahir_pendaftar')
-            ->get()
-            ->groupBy(function($user) {
-                return \Carbon\Carbon::parse($user->tanggallahir_pendaftar)->age;
-            })->map(function($group) {
-                return $group->count();
-            });
-
-        // Chart 3: Nilai (Highest to Lowest Distribution)
-        $scoreCharts = \App\Models\Seleksi::selectRaw('ROUND((nilai_smt1+nilai_smt2+nilai_smt3+nilai_smt4+nilai_smt5)/5, 0) as avg_score, count(*) as total')
-            ->groupBy('avg_score')
-            ->orderBy('avg_score', 'desc')
-            ->get();
+         // Chart 1: Jenis Kelamin (HANYA tampilkan yang sudah diisi)
+         $genderChart = User::where('role', 'PENDAFTAR')
+             ->whereNotNull('jenis_kelamin')
+             ->selectRaw('count(*) as total, jenis_kelamin')
+             ->groupBy('jenis_kelamin')
+             ->get();
+ 
+         // Chart 2: Umur
+         $ageChart = User::where('role', 'PENDAFTAR')
+             ->whereNotNull('tanggallahir_pendaftar')
+             ->get()
+             ->groupBy(function($user) {
+                 return \Carbon\Carbon::parse($user->tanggallahir_pendaftar)->age;
+             })->map(function($group) {
+                 return $group->count();
+             });
+ 
+         // Chart 3: Nilai (Highest to Lowest Distribution) - HANYA user aktif & sudah isi nilai
+         $scoreCharts = \App\Models\Seleksi::whereHas('user')
+             ->selectRaw('ROUND((nilai_smt1+nilai_smt2+nilai_smt3+nilai_smt4+nilai_smt5)/5, 0) as avg_score, count(*) as total')
+             ->whereRaw('(nilai_smt1+nilai_smt2+nilai_smt3+nilai_smt4+nilai_smt5) > 0')
+             ->groupBy('avg_score')
+             ->orderBy('avg_score', 'desc')
+             ->get();
 
         return view('admin.dashboard', compact(
             'totalPendaftar', 'menunggu', 'valid', 'ditolak', 'totalAdmin', 'admins', 'recentApplicants',
@@ -148,21 +151,29 @@ class AdminController extends Controller
         $request->validate([
             'username' => ['required', 'string', 'max:20', 'unique:users,username'],
             'password' => ['required', 'string', 'min:6'],
-            'nama_pendaftar' => ['required', 'string', 'max:50'],
-            'nisn_pendaftar' => ['required', 'string', 'max:20'],
+            'nama_pendaftar' => ['nullable', 'string', 'max:50'],
+            'nisn_pendaftar' => ['nullable', 'string', 'max:20', 'unique:users,nisn_pendaftar'],
         ]);
 
         $user = User::create([
             'username' => $request->username,
             'password' => $request->password,
             'role'     => 'PENDAFTAR',
-            'nomor_pendaftaran' => strtoupper(uniqid('E-')),
+            'nomor_pendaftaran' => date('Y') . str_pad(mt_rand(1, 99999999), 8, '0', STR_PAD_LEFT),
+            'email'             => $request->email,
+            'asal_sekolah'      => $request->asal_sekolah,
+            'no_hp'             => $request->no_hp,
+            'jenis_kelamin'     => $request->jenis_kelamin,
             'nama_pendaftar'    => $request->nama_pendaftar,
             'nisn_pendaftar'    => $request->nisn_pendaftar,
+            'tanggallahir_pendaftar' => $request->tanggallahir_pendaftar,
             'agama'             => $request->agama,
             'alamat_pendaftar'  => $request->alamat_pendaftar,
+            'prestasi'          => $request->prestasi,
             'nama_ortu'         => $request->nama_ortu,
+            'pekerjaan_ortu'    => $request->pekerjaan_ortu,
             'no_hp_ortu'        => $request->no_hp_ortu,
+            'alamat_ortu'       => $request->alamat_ortu,
             'nilai_smt1'        => $request->nilai_smt1 ?? 0,
             'nilai_smt2'        => $request->nilai_smt2 ?? 0,
             'nilai_smt3'        => $request->nilai_smt3 ?? 0,
@@ -193,8 +204,9 @@ class AdminController extends Controller
         ]);
 
         $data = $request->only([
-            'username', 'nama_pendaftar', 'nisn_pendaftar', 'agama', 'alamat_pendaftar',
-            'nama_ortu', 'no_hp_ortu', 'pekerjaan_ortu', 'alamat_ortu',
+            'username', 'email', 'asal_sekolah', 'no_hp', 'jenis_kelamin',
+            'nama_pendaftar', 'nisn_pendaftar', 'tanggallahir_pendaftar', 'agama', 'alamat_pendaftar', 'prestasi',
+            'nama_ortu', 'pekerjaan_ortu', 'no_hp_ortu', 'alamat_ortu',
             'nilai_smt1', 'nilai_smt2', 'nilai_smt3', 'nilai_smt4', 'nilai_smt5'
         ]);
 

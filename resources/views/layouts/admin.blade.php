@@ -29,7 +29,7 @@
         },
         // Modal states moved to global for stacking context fix
         showOtomatis: false,
-        showArchiveConfirm: false,
+        showArchiveConfirm: {{ session('show_force_option') ? 'true' : 'false' }},
         showAddPeriod: false,
         editPeriod: null,
         selectedArchive: null,

@@ -25,22 +25,32 @@
                  </form>
              </div>
 
+             @php 
+                $isRejected = ($user->berkas->status_validasi ?? '') === 'DITOLAK';
+             @endphp
+
              <!-- 2. Status Kelulusan (Seleksi) Form -->
-             <div class="flex items-center gap-2">
+             <div class="flex items-center gap-2 {{ $isRejected ? 'opacity-50 cursor-not-allowed' : '' }}">
                 <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mr-2">Status Seleksi:</p>
-                <form action="{{ route('admin.seleksi.store') }}" method="POST" class="flex items-center gap-2">
-                    @csrf
-                    <input type="hidden" name="user_id" value="{{ $user->id }}">
-                    <input type="hidden" name="nama_seleksi" value="Validasi Akhir Panitia">
-                    <input type="hidden" name="waktu_seleksi" value="{{ now() }}">
-                    
-                    <select name="status_seleksi" class="border border-[#d1d5db] rounded px-3 py-2 text-[10px] font-black uppercase tracking-tight focus:border-[#1e3a8a] outline-none bg-white font-sans">
-                        <option value="MENUNGGU" {{ ($user->seleksis->first()->status_seleksi ?? '') == 'MENUNGGU' ? 'selected' : '' }}>MENUNGGU</option>
-                        <option value="LULUS" {{ ($user->seleksis->first()->status_seleksi ?? '') == 'LULUS' ? 'selected' : '' }}>LULUS</option>
-                        <option value="TIDAK_LULUS" {{ ($user->seleksis->first()->status_seleksi ?? '') == 'TIDAK_LULUS' ? 'selected' : '' }}>TIDAK LULUS</option>
-                    </select>
-                    <button type="submit" class="bg-[#1e3a8a] text-white px-5 py-2 rounded text-[10px] font-black uppercase tracking-widest hover:bg-black transition-colors shadow-lg shadow-blue-900/20">Simpan Seleksi</button>
-                </form>
+                @if($isRejected)
+                    <div class="flex items-center gap-2">
+                        <span class="bg-red-50 text-red-700 border border-red-200 px-4 py-2 rounded text-[9px] font-black uppercase tracking-widest">⚠️ Berkas Ditolak (Seleksi Terkunci)</span>
+                    </div>
+                @else
+                    <form action="{{ route('admin.seleksi.store') }}" method="POST" class="flex items-center gap-2">
+                        @csrf
+                        <input type="hidden" name="user_id" value="{{ $user->id }}">
+                        <input type="hidden" name="nama_seleksi" value="Validasi Akhir Panitia">
+                        <input type="hidden" name="waktu_seleksi" value="{{ now() }}">
+                        
+                        <select name="status_seleksi" class="border border-[#d1d5db] rounded px-3 py-2 text-[10px] font-black uppercase tracking-tight focus:border-[#1e3a8a] outline-none bg-white font-sans">
+                            <option value="MENUNGGU" {{ ($user->seleksis->first()->status_seleksi ?? '') == 'MENUNGGU' ? 'selected' : '' }}>MENUNGGU</option>
+                            <option value="LULUS" {{ ($user->seleksis->first()->status_seleksi ?? '') == 'LULUS' ? 'selected' : '' }}>LULUS</option>
+                            <option value="TIDAK_LULUS" {{ ($user->seleksis->first()->status_seleksi ?? '') == 'TIDAK_LULUS' ? 'selected' : '' }}>TIDAK LULUS</option>
+                        </select>
+                        <button type="submit" class="bg-[#1e3a8a] text-white px-5 py-2 rounded text-[10px] font-black uppercase tracking-widest hover:bg-black transition-colors shadow-lg shadow-blue-900/20">Simpan Seleksi</button>
+                    </form>
+                @endif
              </div>
         </div>
     </div>
@@ -53,32 +63,44 @@
             <!-- Data Diri Card (Membaca dari tabel USERS) -->
             <div class="bg-white border border-[#e2e8f0] rounded-lg shadow-sm">
                 <div class="p-5 border-b border-[#f1f5f9]">
-                    <h3 class="text-sm font-bold text-[#111827]">01. Data Diri & Orang Tua</h3>
+                    <h3 class="text-sm font-bold text-[#111827]">01. Data Diri Calon Siswa</h3>
                 </div>
                 <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
                     <div class="space-y-1">
-                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Nama Lengkap</p>
-                        <p class="text-sm font-bold text-[#111827]">{{ $user->nama_pendaftar ?? $user->username }}</p>
+                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Nomor Pendaftaran</p>
+                        <p class="text-sm font-black text-[#1e3a8a]">{{ $user->nomor_pendaftaran ?? '-' }}</p>
                     </div>
                     <div class="space-y-1">
-                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Jenis Kelamin</p>
-                        <p class="text-sm font-bold text-[#111827]">{{ $user->jenis_kelamin ?? '-' }}</p>
+                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Email</p>
+                        <p class="text-sm font-bold text-[#111827]">{{ $user->email ?? '-' }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Nama Lengkap</p>
+                        <p class="text-sm font-bold text-[#111827]">{{ $user->nama_pendaftar ?? $user->username }}</p>
                     </div>
                     <div class="space-y-1">
                         <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">NISN</p>
                         <p class="text-sm font-bold text-[#111827]">{{ $user->nisn_pendaftar ?? '-' }}</p>
                     </div>
                     <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Jenis Kelamin</p>
+                        <p class="text-sm font-bold text-[#111827]">{{ $user->jenis_kelamin == 'L' ? 'Laki-laki' : ($user->jenis_kelamin == 'P' ? 'Perempuan' : '-') }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Tanggal Lahir</p>
+                        <p class="text-sm font-bold text-[#111827]">{{ $user->tanggallahir_pendaftar ? \Carbon\Carbon::parse($user->tanggallahir_pendaftar)->format('d F Y') : '-' }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Asal Sekolah</p>
+                        <p class="text-sm font-bold text-[#111827]">{{ $user->asal_sekolah ?? '-' }}</p>
+                    </div>
+                    <div class="space-y-1">
                         <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Agama</p>
                         <p class="text-sm font-bold text-[#111827]">{{ $user->agama ?? '-' }}</p>
                     </div>
                     <div class="space-y-1">
-                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Nama Orang Tua</p>
-                        <p class="text-sm font-bold text-[#111827]">{{ $user->nama_ortu ?? '-' }}</p>
-                    </div>
-                    <div class="space-y-1">
-                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">No. HP Orang Tua</p>
-                        <p class="text-sm font-bold text-[#111827]">{{ $user->no_hp_ortu ?? '-' }}</p>
+                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">No. HP Pendaftar</p>
+                        <p class="text-sm font-bold text-[#111827]">{{ $user->no_hp ?? '-' }}</p>
                     </div>
                     <div class="space-y-1 md:col-span-2">
                         <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Alamat Lengkap</p>
@@ -87,10 +109,35 @@
                 </div>
             </div>
 
+            <!-- Data Orang Tua Card -->
+            <div class="bg-white border border-[#e2e8f0] rounded-lg shadow-sm">
+                <div class="p-5 border-b border-[#f1f5f9]">
+                    <h3 class="text-sm font-bold text-[#111827]">02. Data Orang Tua / Wali</h3>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Nama Orang Tua</p>
+                        <p class="text-sm font-bold text-[#111827]">{{ $user->nama_ortu ?? '-' }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">No. HP Orang Tua</p>
+                        <p class="text-sm font-bold text-[#111827]">{{ $user->no_hp_ortu ?? '-' }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Pekerjaan Orang Tua</p>
+                        <p class="text-sm font-bold text-[#111827]">{{ $user->pekerjaan_ortu ?? '-' }}</p>
+                    </div>
+                    <div class="space-y-1 md:col-span-2">
+                        <p class="text-[10px] font-bold text-[#6b7280] uppercase tracking-widest">Alamat Orang Tua</p>
+                        <p class="text-sm font-bold text-[#111827]">{{ $user->alamat_ortu ?? '-' }}</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Dokumen Fisik Card -->
             <div class="bg-white border border-[#e2e8f0] rounded-lg shadow-sm">
                 <div class="p-5 border-b border-[#f1f5f9]">
-                    <h3 class="text-sm font-bold text-[#111827]">02. Dokumen Lampiran</h3>
+                    <h3 class="text-sm font-bold text-[#111827]">03. Dokumen Lampiran</h3>
                 </div>
                 <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                     @foreach([
